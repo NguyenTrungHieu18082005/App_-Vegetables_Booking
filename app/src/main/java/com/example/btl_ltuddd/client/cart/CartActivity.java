@@ -15,6 +15,7 @@ import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.client.dashboard.ClientActivity;
 import com.example.btl_ltuddd.client.dashboard.Product;
 import com.example.btl_ltuddd.client.listproduct.CategoriesActivity;
+import com.example.btl_ltuddd.client.profile.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,8 +70,9 @@ public class CartActivity extends AppCompatActivity {
                 Toast.makeText(this, "Bạn đang ở Giỏ hàng", Toast.LENGTH_SHORT).show()
         );
 
-        btnNavProfile.setOnClickListener(v ->
-                Toast.makeText(this, "Mở màn hình Cá nhân", Toast.LENGTH_SHORT).show()
-        );
+        btnNavProfile.setOnClickListener(v -> {
+            startActivity(new Intent(this, ProfileActivity.class));
+            finish();
+        });
     }
 }

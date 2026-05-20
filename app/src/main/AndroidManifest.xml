@@ -12,6 +12,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BTL_LTUDDD">
         <activity
+            android:name=".client.profile.PersonalAddress.AddressActivity"
+            android:exported="false" />
+        <activity
+            android:name=".client.profile.PersonalInfo.PersonalInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".client.profile.ProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".client.listproduct.detail.ProductDetailActivity"
             android:exported="false" />
         <activity

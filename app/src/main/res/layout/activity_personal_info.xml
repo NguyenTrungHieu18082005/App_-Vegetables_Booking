@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F7F8F3">
+
+    <LinearLayout
+        android:id="@+id/layoutHeader"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingHorizontal="16dp"
+        android:background="#F7F8F3">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:src="@drawable/ic_home"
+            android:background="@drawable/bg_search"
+            android:padding="8dp"
+            android:clickable="true"
+            android:focusable="true"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Thông tin cá nhân"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#114D18"
+            android:gravity="center"/>
+
+        <View android:layout_width="36dp" android:layout_height="36dp"/>
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/layoutHeader">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- AVATAR -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginBottom="24dp">
+
+                <FrameLayout
+                    android:layout_width="90dp"
+                    android:layout_height="90dp">
+                    <ImageView
+                        android:layout_width="90dp"
+                        android:layout_height="90dp"
+                        android:src="@drawable/tomato"
+                        android:scaleType="centerCrop"
+                        android:background="@drawable/bg_bottom_navigation"/>
+                    <ImageView
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="bottom|end"
+                        android:src="@drawable/ic_add"
+                        android:background="@drawable/bg_tag"
+                        android:padding="6dp"/>
+                </FrameLayout>
+            </LinearLayout>
+
+            <!-- FORM -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Họ và tên" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <EditText
+                android:id="@+id/edtFullName"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Nguyễn Văn A"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_search"
+                android:layout_marginBottom="16dp"
+                android:inputType="textPersonName"/>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Số điện thoại" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <EditText
+                android:id="@+id/edtPhone"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="090 123 4567"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_search"
+                android:layout_marginBottom="16dp"
+                android:inputType="phone"/>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Email" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <EditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="example@email.com"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_search"
+                android:layout_marginBottom="16dp"
+                android:inputType="textEmailAddress"/>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ngày sinh" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <EditText
+                android:id="@+id/edtDob"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="DD/MM/YYYY"
+                android:paddingHorizontal="16dp"
+                android:background="@drawable/bg_search"
+                android:layout_marginBottom="24dp"
+                android:inputType="date"/>
+
+            <Button
+                android:id="@+id/btnSaveInfo"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:text="Lưu thay đổi"
+                android:textAllCaps="false"
+                android:textSize="16sp"
+                android:textColor="#FFF"
+                android:backgroundTint="#114D18"
+                android:background="@drawable/bg_bottom_navigation"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</RelativeLayout>

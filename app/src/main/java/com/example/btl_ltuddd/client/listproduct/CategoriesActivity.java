@@ -16,6 +16,7 @@ import com.example.btl_ltuddd.client.cart.CartActivity;
 import com.example.btl_ltuddd.client.dashboard.ClientActivity;
 import com.example.btl_ltuddd.client.dashboard.Product;
 import com.example.btl_ltuddd.client.dashboard.ProductAdapter;
+import com.example.btl_ltuddd.client.profile.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -107,7 +108,9 @@ public class CategoriesActivity extends AppCompatActivity {
         });
 
         btnNavProfile.setOnClickListener(v -> {
-            Toast.makeText(this, "Mở màn hình Cá nhân", Toast.LENGTH_SHORT).show();
-        });
-    }
+            Intent intent = new Intent(CategoriesActivity.this, ProfileActivity.class);
+            startActivity(intent);
+            finish(); // Đóng màn hình danh mục này lại        });
+    });
+}
 }

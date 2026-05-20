@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.btl_ltuddd.client.cart.CartActivity;
 import com.example.btl_ltuddd.client.listproduct.CategoriesActivity;
 import com.example.btl_ltuddd.R;
+import com.example.btl_ltuddd.client.profile.ProfileActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -82,9 +83,8 @@ public class ClientActivity extends AppCompatActivity {
 
         btnNavProfile.setOnClickListener(v -> {
             selectTab(4); // Đổi giao diện Highlight sang Profile
-            Toast.makeText(ClientActivity.this, "Chuyển sang màn hình Cá nhân", Toast.LENGTH_SHORT).show();
-            // Intent intent = new Intent(ClientActivity.this, ProfileActivity.class);
-            // startActivity(intent);
+             Intent intent = new Intent(ClientActivity.this, ProfileActivity.class);
+             startActivity(intent);
         });
     }
 
