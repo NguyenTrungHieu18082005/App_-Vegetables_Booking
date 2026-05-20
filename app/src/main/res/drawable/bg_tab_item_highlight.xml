@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Khi tab được CHỌN (Active) -->
+    <item android:state_selected="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#B8F55A" /> <!-- Màu nền highlight (Xanh chuối giống nút Banner) -->
+            <corners android:radius="20dp" />
+        </shape>
+    </item>
+
+    <!-- Khi tab ở trạng thái BÌNH THƯỜNG (Inactive) -->
+    <item android:state_selected="false">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" /> <!-- Trong suốt -->
+        </shape>
+    </item>
+</selector>
