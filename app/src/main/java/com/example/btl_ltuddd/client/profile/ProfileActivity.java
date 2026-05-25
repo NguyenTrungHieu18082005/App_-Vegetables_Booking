@@ -14,9 +14,13 @@ import com.example.btl_ltuddd.client.dashboard.ClientActivity;
 import com.example.btl_ltuddd.client.listproduct.CategoriesActivity;
 import com.example.btl_ltuddd.client.profile.PersonalAddress.AddressActivity;
 import com.example.btl_ltuddd.client.profile.PersonalInfo.PersonalInfoActivity;
+import android.content.SharedPreferences;
+import android.widget.TextView;
 
+import com.example.btl_ltuddd.database.DatabaseHelper;
 public class ProfileActivity extends AppCompatActivity {
-
+    TextView txtUserName;
+    DatabaseHelper dbHelper;
     LinearLayout menuPersonalInfo, menuAddress, btnLogout;
     LinearLayout btnNavHome, btnNavCategories, btnNavOrders;
 
@@ -72,6 +76,27 @@ public class ProfileActivity extends AppCompatActivity {
         btnNavOrders.setOnClickListener(v ->
                 Toast.makeText(this, "Mở Đơn hàng", Toast.LENGTH_SHORT).show()
         );
+
+        txtUserName = findViewById(R.id.txtUserName);
+
+        dbHelper = DatabaseHelper.getInstance(this);
+
+        // lấy dữ liệu trả ra textName
+        // Lấy user hiện tại
+        SharedPreferences prefs =
+                getSharedPreferences("auth", MODE_PRIVATE);
+
+        long userId =
+                prefs.getLong("userId", -1);
+
+        if (userId != -1) {
+
+            String fullName =
+                    dbHelper.getUserNameById(userId);
+
+            txtUserName.setText(fullName);
+        }
     }
+
 
 }
