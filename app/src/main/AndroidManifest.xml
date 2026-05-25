@@ -12,7 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BTL_LTUDDD">
         <activity
-            android:name=".admin.fragment.AdminDashboardFragment"
+            android:name=".admin.product.addeditproduct.AddEditProductActivity"
+            android:exported="false" />
+        <activity
+            android:name=".admin.product.AdminProductActivity"
             android:exported="false" />
         <activity
             android:name=".admin.AdminActivity"

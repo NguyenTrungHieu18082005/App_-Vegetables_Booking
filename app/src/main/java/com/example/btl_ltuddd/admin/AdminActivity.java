@@ -1,10 +1,12 @@
 package com.example.btl_ltuddd.admin;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.admin.fragment.AdminDashboardFragment;
+import com.example.btl_ltuddd.admin.product.AdminProductActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 public class AdminActivity extends AppCompatActivity {
@@ -32,9 +34,10 @@ public class AdminActivity extends AppCompatActivity {
                         .commit();
                 return true;
             } else if (id == R.id.nav_categories) {
-                // TODO: ProductsFragment
-                return true;
-            } else if (id == R.id.nav_orders) {
+                startActivity(new Intent(this, AdminProductActivity.class));
+                return true;  // ← KHÔNG có finish()
+            }
+            else if (id == R.id.nav_orders) {
                 // TODO: OrdersFragment
                 return true;
             } else if (id == R.id.nav_profile) {

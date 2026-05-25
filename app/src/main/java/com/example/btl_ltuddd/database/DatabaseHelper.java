@@ -6,7 +6,11 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
+import android.database.Cursor;
+import android.content.ContentValues;
+import com.example.btl_ltuddd.model.Product;
+import java.util.ArrayList;
+import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String DB_NAME    = "hoaquasach.db";
@@ -32,10 +36,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper instance;
 
+    // Thêm vào phần khai báo constants
+    public static final String COL_P_UNIT    = "unit";
+    public static final String COL_P_VISIBLE = "is_visible";
+
     // Singleton — dùng chung 1 instance trong toàn app
-    public static synchronized DatabaseHelper getInstance(Context ctx) {
-        if (instance == null)
-            instance = new DatabaseHelper(ctx.getApplicationContext());
+    public static synchronized DatabaseHelper getInstance(Context context) {
+        if (instance == null) {
+            instance = new DatabaseHelper(context.getApplicationContext());
+        }
         return instance;
     }
 
@@ -60,17 +69,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_P_DESC     + " TEXT, "
                 + COL_P_CATEGORY + " TEXT, "
                 + COL_P_IMAGE    + " TEXT, "
-                + COL_P_STOCK    + " INTEGER DEFAULT 0"
+                + COL_P_STOCK    + " INTEGER DEFAULT 0, "
+                + COL_P_UNIT     + " TEXT, "
+                + COL_P_VISIBLE  + " INTEGER DEFAULT 1"
                 + ")");
+
+
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         onCreate(db);
     }
-
     // ─── USER METHODS ──────────────────────────────────────────
 
     /** Đăng ký → trả về id nếu thành công, -1 nếu email đã tồn tại */
@@ -142,5 +154,116 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         c.close();
         return count;
     }
+
+    // Thêm sản phẩm
+    public long addProduct(String name, double price, String description,
+                           String category, String imageUrl, int stock,
+                           String unit, boolean isVisible) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_P_NAME,     name);
+        values.put(COL_P_PRICE,    price);
+        values.put(COL_P_DESC,     description);
+        values.put(COL_P_CATEGORY, category);
+        values.put(COL_P_IMAGE,    imageUrl);
+        values.put(COL_P_STOCK,    stock);
+        values.put(COL_P_UNIT,     unit);
+        values.put(COL_P_VISIBLE,  isVisible ? 1 : 0);
+        return db.insert(TABLE_PRODUCTS, null, values);
+    }
+
+    public int updateProduct(int id, String name, double price, String description,
+                             String category, String imageUrl, int stock,
+                             String unit, boolean isVisible) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_P_NAME,     name);
+        values.put(COL_P_PRICE,    price);
+        values.put(COL_P_DESC,     description);
+        values.put(COL_P_CATEGORY, category);
+        values.put(COL_P_IMAGE,    imageUrl);
+        values.put(COL_P_STOCK,    stock);
+        values.put(COL_P_UNIT,     unit);
+        values.put(COL_P_VISIBLE,  isVisible ? 1 : 0);
+        return db.update(TABLE_PRODUCTS, values,
+                COL_P_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
+    // Sửa cursorToProduct()
+    private Product cursorToProduct(Cursor cursor) {
+        return new Product(
+                cursor.getInt(cursor.getColumnIndexOrThrow(COL_P_ID)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COL_P_NAME)),
+                cursor.getDouble(cursor.getColumnIndexOrThrow(COL_P_PRICE)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COL_P_DESC)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COL_P_CATEGORY)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COL_P_IMAGE)),
+                cursor.getInt(cursor.getColumnIndexOrThrow(COL_P_STOCK)),
+                cursor.getString(cursor.getColumnIndexOrThrow(COL_P_UNIT)),
+                cursor.getInt(cursor.getColumnIndexOrThrow(COL_P_VISIBLE)) == 1
+        );
+    }
+    // Trong DatabaseHelper.java
+    public Product getProductById(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.query("products", null, "id = ?",
+                new String[]{String.valueOf(id)}, null, null, null);
+
+        Product product = null;
+        if (cursor != null && cursor.moveToFirst()) {
+            product = new Product(
+                    cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                    cursor.getDouble(cursor.getColumnIndexOrThrow("price")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("description")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("category")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("image_url")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("stock")),
+                    cursor.getString(cursor.getColumnIndexOrThrow("unit")),
+                    cursor.getInt(cursor.getColumnIndexOrThrow("is_visible")) == 1  // ✅ sửa ở đây
+            );
+            cursor.close();
+        }
+        return product;
+    }
+
+
+    // Xóa sản phẩm
+    public boolean deleteProduct(int id) {
+        SQLiteDatabase db = getWritableDatabase();
+        return db.delete("products", "id=?", new String[]{String.valueOf(id)}) > 0;
+    }
+
+    // Lấy tất cả sản phẩm
+    public List<Product> getAllProducts() {
+        List<Product> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM products ORDER BY name ASC", null);
+        while (cursor.moveToNext()) {
+            list.add(cursorToProduct(cursor));
+        }
+        cursor.close();
+        return list;
+    }
+
+    // Tìm kiếm theo tên
+    public List<Product> searchProducts(String query) {
+        List<Product> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM products WHERE name LIKE ? ORDER BY name ASC",
+                new String[]{"%" + query + "%"}
+        );
+        while (cursor.moveToNext()) {
+            list.add(cursorToProduct(cursor));
+        }
+        cursor.close();
+        return list;
+    }
+
+    // Helper
+
+
+
 }
 
