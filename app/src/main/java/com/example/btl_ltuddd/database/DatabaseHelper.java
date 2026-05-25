@@ -19,7 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     DatabaseHelper dbHelper;
 
     public static final String DB_NAME    = "hoaquasach.db";
-    private static final int    DB_VERSION = 2;
+    private static final int    DB_VERSION = 3;
 
     // Bảng users
     public static final String TABLE_USERS = "users";
@@ -55,6 +55,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_O_STATUS     = "status";
     public static final String COL_O_CREATED    = "created_at";
     public static final String COL_O_ADDRESS    = "address";
+
+    private static final String TABLE_CART = "cart";
+
+
 
     // Singleton — dùng chung 1 instance trong toàn app
     public static synchronized DatabaseHelper getInstance(Context context) {
@@ -101,14 +105,57 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_O_ADDRESS    + " TEXT"
                 + ")");
 
+        String createCart =
+
+                "CREATE TABLE " + TABLE_CART + "(" +
+
+                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                        "user_id INTEGER NOT NULL," +
+
+                        "product_id INTEGER NOT NULL," +
+
+                        "quantity INTEGER DEFAULT 1," +
+
+                        "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
+
+                        "FOREIGN KEY(user_id) REFERENCES users(id)," +
+
+                        "FOREIGN KEY(product_id) REFERENCES products(id)" +
+
+                        ")";
+
+        db.execSQL(createCart);
+
 
     }
 
     @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_PRODUCTS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
-        onCreate(db);
+    public void onUpgrade(
+            SQLiteDatabase db,
+            int oldVersion,
+            int newVersion
+    ) {
+
+        db.execSQL(
+                "DROP TABLE IF EXISTS cart"
+        );
+
+        db.execSQL(
+                "DROP TABLE IF EXISTS orders"
+        );
+
+        db.execSQL(
+                "DROP TABLE IF EXISTS products"
+        );
+
+        db.execSQL(
+                "DROP TABLE IF EXISTS users"
+        );
+
+        onCreate(
+                db
+        );
     }
     // ─── USER METHODS ──────────────────────────────────────────
 
@@ -494,6 +541,238 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    // Hàm thêm vào giỏ hàng
+
+    // Hàm thêm vào giỏ hàng
+    public long insertCart(
+            int userId,
+            int productId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        // Kiểm tra sản phẩm đã tồn tại trong giỏ chưa
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT quantity " +
+                                "FROM cart " +
+                                "WHERE user_id=? " +
+                                "AND product_id=?",
+
+                        new String[]{
+
+                                String.valueOf(
+                                        userId
+                                ),
+
+                                String.valueOf(
+                                        productId
+                                )
+                        }
+
+                );
+
+        if (cursor.moveToFirst()) {
+
+            int quantity =
+                    cursor.getInt(0);
+
+            ContentValues values =
+                    new ContentValues();
+
+            values.put(
+                    "quantity",
+                    quantity + 1
+            );
+
+            db.update(
+
+                    TABLE_CART,
+
+                    values,
+
+                    "user_id=? AND product_id=?",
+
+                    new String[]{
+
+                            String.valueOf(
+                                    userId
+                            ),
+
+                            String.valueOf(
+                                    productId
+                            )
+
+                    }
+
+            );
+
+            cursor.close();
+
+            return 1;
+        }
+
+        cursor.close();
+
+        ContentValues values =
+                new ContentValues();
+
+        values.put(
+                "user_id",
+                userId
+        );
+
+        values.put(
+                "product_id",
+                productId
+        );
+
+        values.put(
+                "quantity",
+                1
+        );
+
+        return db.insert(
+
+                TABLE_CART,
+
+                null,
+
+                values
+
+        );
+    }
+
+
+
+    // Lấy sản phẩm trong giỏ hàng
+    public List<Product> getCartProducts(
+            int userId
+    ) {
+
+        List<Product> list =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT p.* " +
+
+                                "FROM cart c " +
+
+                                "INNER JOIN products p " +
+
+                                "ON c.product_id = p.id " +
+
+                                "WHERE c.user_id=?",
+
+                        new String[]{
+
+                                String.valueOf(
+                                        userId
+                                )
+
+                        }
+
+                );
+
+        if (
+                cursor.moveToFirst()
+        ) {
+
+            do {
+
+                Product product =
+                        cursorToProduct(
+                                cursor
+                        );
+
+                list.add(
+                        product
+                );
+
+            }
+
+            while (
+                    cursor.moveToNext()
+            );
+
+        }
+
+        cursor.close();
+
+        return list;
+    }
+
+
+
+    // Xóa sản phẩm khỏi giỏ
+    public boolean removeCart(
+            int userId,
+            int productId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        int rows =
+
+                db.delete(
+
+                        TABLE_CART,
+
+                        "user_id=? AND product_id=?",
+
+                        new String[]{
+
+                                String.valueOf(
+                                        userId
+                                ),
+
+                                String.valueOf(
+                                        productId
+                                )
+
+                        }
+
+                );
+
+        return rows > 0;
+
+    }
+
+
+
+    // Xóa toàn bộ giỏ hàng
+    public void clearCart(
+            int userId
+    ) {
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        db.delete(
+
+                TABLE_CART,
+
+                "user_id=?",
+
+                new String[]{
+
+                        String.valueOf(
+                                userId
+                        )
+
+                }
+
+        );
+
+    }
 
 }
 

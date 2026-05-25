@@ -18,7 +18,7 @@ import java.util.List;
 import android.content.Intent;
 import com.example.btl_ltuddd.client.listproduct.detail.ProductDetailActivity;
 import com.example.btl_ltuddd.model.Product;
-
+import com.example.btl_ltuddd.database.DatabaseHelper;
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
 
     private Context context;
@@ -77,6 +77,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 //                product.getCategory()
 //        );
 
+
         if (
                 product.getImageUrl() != null
         ) {
@@ -86,6 +87,51 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
                             product.getImageUrl()
                     )
             );
+
+            holder.btnAdd.setOnClickListener(v -> {
+
+                long userId =
+
+                        context
+
+                                .getSharedPreferences(
+                                        "auth",
+                                        Context.MODE_PRIVATE
+                                )
+
+                                .getLong(
+                                        "userId",
+                                        -1
+                                );
+
+                if (userId == -1) {
+
+                    Toast.makeText(
+                            context,
+                            "Vui lòng đăng nhập",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    return;
+                }
+
+                DatabaseHelper db =
+                        DatabaseHelper.getInstance(
+                                context
+                        );
+
+                db.insertCart(
+                        (int) userId,
+                        product.getId()
+                );
+
+                Toast.makeText(
+                        context,
+                        "Đã thêm vào giỏ hàng",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+            });
         }
 
     }
@@ -100,6 +146,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 
         ImageView imgProduct;
 
+        ImageButton btnAdd;
         TextView txtName;
 
         TextView txtPrice;
@@ -138,6 +185,11 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
 //                    itemView.findViewById(
 //                            R.id.txtBadge
 //                    );
+            //Khai báo thêm nút thêm vào giỏ
+            btnAdd =
+                    itemView.findViewById(
+                            R.id.btnAdd
+                    );
 
         }
     }

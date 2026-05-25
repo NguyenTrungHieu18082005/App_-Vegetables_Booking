@@ -17,6 +17,7 @@ import com.example.btl_ltuddd.client.profile.ProfileActivity;
 import com.example.btl_ltuddd.database.DatabaseHelper;
 import com.example.btl_ltuddd.model.Product;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CartActivity extends AppCompatActivity {
@@ -48,6 +49,22 @@ public class CartActivity extends AppCompatActivity {
                 R.layout.activity_cart
         );
 
+        initViews();
+
+        dbHelper =
+                DatabaseHelper.getInstance(
+                        this
+                );
+
+        loadCart();
+
+        setupEvents();
+
+        setupNavigation();
+    }
+
+    private void initViews() {
+
         recyclerCart =
                 findViewById(
                         R.id.recyclerCart
@@ -77,34 +94,36 @@ public class CartActivity extends AppCompatActivity {
                 findViewById(
                         R.id.btnNavProfile
                 );
-
-        dbHelper =
-                DatabaseHelper.getInstance(
-                        this
-                );
-
-        loadCart();
-
-        btnOrder.setOnClickListener(v ->
-
-                Toast.makeText(
-                        this,
-                        "Đặt hàng thành công!",
-                        Toast.LENGTH_SHORT
-                ).show()
-
-        );
-
-        setupNavigation();
     }
 
     private void loadCart() {
 
-        // Tạm thời dùng sản phẩm từ DB
-        // Sau này đổi sang getCart()
+        long userId =
 
-        cartList =
-                dbHelper.getAllProducts();
+                getSharedPreferences(
+                        "auth",
+                        MODE_PRIVATE
+                )
+
+                        .getLong(
+                                "userId",
+                                -1
+                        );
+
+        if (userId == -1) {
+
+            cartList =
+                    new ArrayList<>();
+
+        }
+
+        else {
+
+            cartList =
+                    dbHelper.getCartProducts(
+                            (int) userId
+                    );
+        }
 
         adapter =
                 new CartAdapter(
@@ -130,6 +149,32 @@ public class CartActivity extends AppCompatActivity {
                     Toast.LENGTH_SHORT
             ).show();
         }
+
+    }
+
+    private void setupEvents() {
+
+        btnOrder.setOnClickListener(v -> {
+
+            if (cartList.isEmpty()) {
+
+                Toast.makeText(
+                        this,
+                        "Không có sản phẩm để đặt",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+            Toast.makeText(
+                    this,
+                    "Đặt hàng thành công",
+                    Toast.LENGTH_SHORT
+            ).show();
+
+        });
+
     }
 
     private void setupNavigation() {
@@ -137,25 +182,31 @@ public class CartActivity extends AppCompatActivity {
         btnNavHome.setOnClickListener(v -> {
 
             startActivity(
+
                     new Intent(
                             this,
                             ClientActivity.class
                     )
+
             );
 
             finish();
+
         });
 
         btnNavCategories.setOnClickListener(v -> {
 
             startActivity(
+
                     new Intent(
                             this,
                             CategoriesActivity.class
                     )
+
             );
 
             finish();
+
         });
 
         btnNavOrders.setOnClickListener(v ->
@@ -171,14 +222,18 @@ public class CartActivity extends AppCompatActivity {
         btnNavProfile.setOnClickListener(v -> {
 
             startActivity(
+
                     new Intent(
                             this,
                             ProfileActivity.class
                     )
+
             );
 
             finish();
+
         });
+
     }
 
     @Override
@@ -187,5 +242,6 @@ public class CartActivity extends AppCompatActivity {
         super.onResume();
 
         loadCart();
+
     }
 }

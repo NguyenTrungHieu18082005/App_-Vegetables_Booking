@@ -67,7 +67,7 @@ public class CartAdapter
 
         holder.txtCartPrice.setText(
                 String.format(
-                        "%.0fđ",
+                        "%,.0fđ",
                         product.getPrice()
                 )
         );
