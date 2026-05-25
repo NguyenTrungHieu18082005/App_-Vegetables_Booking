@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.btl_ltuddd.MainActivity;
 import com.example.btl_ltuddd.R;
+import com.example.btl_ltuddd.auth.LoginActivity;
 import com.example.btl_ltuddd.client.dashboard.ClientActivity;
 import com.example.btl_ltuddd.client.listproduct.CategoriesActivity;
 import com.example.btl_ltuddd.client.profile.PersonalAddress.AddressActivity;
@@ -40,9 +41,22 @@ public class ProfileActivity extends AppCompatActivity {
         );
 
         btnLogout.setOnClickListener(v -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+            // Xóa phiên đăng nhập
+            getSharedPreferences("auth", MODE_PRIVATE)
+                    .edit()
+                    .clear()
+                    .apply();
+
+            Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
+
+            intent.setFlags(
+                    Intent.FLAG_ACTIVITY_NEW_TASK |
+                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+            );
+
             startActivity(intent);
+            finish();
         });
 
         btnNavHome.setOnClickListener(v -> {
@@ -59,4 +73,5 @@ public class ProfileActivity extends AppCompatActivity {
                 Toast.makeText(this, "Mở Đơn hàng", Toast.LENGTH_SHORT).show()
         );
     }
+
 }
