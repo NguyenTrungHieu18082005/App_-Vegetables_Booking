@@ -4,7 +4,6 @@ package com.example.btl_ltuddd.client.listproduct;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,103 +13,144 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.client.cart.CartActivity;
 import com.example.btl_ltuddd.client.dashboard.ClientActivity;
-import com.example.btl_ltuddd.client.dashboard.Product;
 import com.example.btl_ltuddd.client.dashboard.ProductAdapter;
 import com.example.btl_ltuddd.client.profile.ProfileActivity;
+import com.example.btl_ltuddd.database.DatabaseHelper;
+import com.example.btl_ltuddd.model.Product;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class CategoriesActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-    ProductAdapter adapter;
-    List<Product> productList;
+    private RecyclerView recyclerView;
 
-    TextView txtSort;
-    LinearLayout btnNavHome, btnNavOrders, btnNavProfile;
+    private ProductAdapter adapter;
+
+    private List<Product> productList;
+
+    private DatabaseHelper dbHelper;
+
+    private LinearLayout btnNavHome;
+
+    private LinearLayout btnNavOrders;
+
+    private LinearLayout btnNavProfile;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_categories);
 
-        // ==========================================
-        // 1. ĐỔ DATA SẢN PHẨM THEO GIAO DIỆN MỚI
-        // ==========================================
-        recyclerView = findViewById(R.id.recyclerCategories);
-        productList = new ArrayList<>();
+        setContentView(
+                R.layout.activity_categories
+        );
 
-        // Thêm dữ liệu rau củ mới từ ảnh mẫu
-        productList.add(new Product(
-                "Súp lơ xanh",
-                "35.000đ",
-                "/ 500g / Túi",
-                R.drawable.tomato, // Hãy đảm bảo bạn đã có ảnh súp lơ trong drawable nhé
-                "ORGANIC"
-        ));
+        recyclerView =
+                findViewById(
+                        R.id.recyclerCategories
+                );
 
-        productList.add(new Product(
-                "Cà rốt hữu cơ",
-                "42.000đ",
-                "/ 1kg / Túi",
-                R.drawable.tomato,
-                "ĐÀ LẠT"
-        ));
+        btnNavHome =
+                findViewById(
+                        R.id.btnNavHome
+                );
 
-        productList.add(new Product(
-                "Cà chua bi đỏ",
-                "28.000đ",
-                "/ 300g / Hộp",
-                R.drawable.tomato,
-                "SALE"
-        ));
+        btnNavOrders =
+                findViewById(
+                        R.id.btnNavOrders
+                );
 
-        productList.add(new Product(
-                "Cải xoăn Kale",
-                "45.000đ",
-                "/ 250g / Túi",
-                R.drawable.tomato,
-                ""
-        ));
+        btnNavProfile =
+                findViewById(
+                        R.id.btnNavProfile
+                );
 
-        // Tái sử dụng ProductAdapter đã xử lý nút thêm vào giỏ hàng ở câu trước
-        adapter = new ProductAdapter(this, productList);
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        recyclerView.setAdapter(adapter);
+        dbHelper =
+                DatabaseHelper.getInstance(
+                        this
+                );
 
-        // ==========================================
-//        // 2. XỬ LÝ SỰ KIỆN BỘ LỌC SẮP XẾP
-//        // ==========================================
-//        txtSort = findViewById(R.id.txtSort);
-//        txtSort.setOnClickListener(v -> {
-//            Toast.makeText(this, "Mở tính năng lọc theo giá/bán chạy", Toast.LENGTH_SHORT).show();
-//        });
+        loadProducts();
 
-        // ==========================================
-        // 3. ĐIỀU HƯỚNG QUAY LẠI TRANG CHỦ (HOME)
-        // ==========================================
-        btnNavHome = findViewById(R.id.btnNavHome);
-        btnNavOrders = findViewById(R.id.btnNavOrders);
-        btnNavProfile = findViewById(R.id.btnNavProfile);
+        setupNavigation();
+    }
 
-        // Nhấn nút Home để quay lại ClientActivity trang chủ
+    private void loadProducts() {
+
+        productList =
+                dbHelper.getAllProducts();
+
+        adapter =
+                new ProductAdapter(
+                        this,
+                        productList
+                );
+
+        recyclerView.setLayoutManager(
+                new GridLayoutManager(
+                        this,
+                        2
+                )
+        );
+
+        recyclerView.setAdapter(
+                adapter
+        );
+
+        if (productList.isEmpty()) {
+
+            Toast.makeText(
+                    this,
+                    "Không có sản phẩm",
+                    Toast.LENGTH_SHORT
+            ).show();
+        }
+    }
+
+    private void setupNavigation() {
+
         btnNavHome.setOnClickListener(v -> {
-            Intent intent = new Intent(CategoriesActivity.this, ClientActivity.class);
-            startActivity(intent);
-            finish(); // Đóng màn hình danh mục này lại
+
+            startActivity(
+                    new Intent(
+                            CategoriesActivity.this,
+                            ClientActivity.class
+                    )
+            );
+
+            finish();
         });
 
         btnNavOrders.setOnClickListener(v -> {
-            Intent intent = new Intent(CategoriesActivity.this, CartActivity.class);
-            startActivity(intent);
-            finish(); // Đóng màn hình danh mục này lại
+
+            startActivity(
+                    new Intent(
+                            CategoriesActivity.this,
+                            CartActivity.class
+                    )
+            );
+
+            finish();
         });
 
         btnNavProfile.setOnClickListener(v -> {
-            Intent intent = new Intent(CategoriesActivity.this, ProfileActivity.class);
-            startActivity(intent);
-            finish(); // Đóng màn hình danh mục này lại        });
-    });
-}
+
+            startActivity(
+                    new Intent(
+                            CategoriesActivity.this,
+                            ProfileActivity.class
+                    )
+            );
+
+            finish();
+        });
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        loadProducts();
+    }
 }

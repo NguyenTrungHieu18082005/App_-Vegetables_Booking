@@ -19,11 +19,20 @@ import com.example.btl_ltuddd.client.profile.ProfileActivity;
 import java.util.ArrayList;
 import java.util.List;
 
+
+import com.example.btl_ltuddd.database.DatabaseHelper;
+import com.example.btl_ltuddd.model.Product;
+
+import java.util.List;
 public class ClientActivity extends AppCompatActivity {
 
-    RecyclerView recyclerView;
-    ProductAdapter adapter;
-    List<Product> productList;
+    private RecyclerView recyclerView;
+
+    private ProductAdapter adapter;
+
+    private List<Product> productList;
+
+    private DatabaseHelper dbHelper;
 
     // Khai báo các nút bấm cha trên thanh Menu dưới cùng
     LinearLayout btnNavHome, btnNavCategories, btnNavOrders, btnNavProfile;
@@ -32,6 +41,7 @@ public class ClientActivity extends AppCompatActivity {
     LinearLayout bgHome, bgCategories, bgOrders, bgProfile;
     ImageView icHome, icCategories, icOrders, icProfile;
     TextView tvHome, tvCategories, tvOrders, tvProfile;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +54,17 @@ public class ClientActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerProducts);
         productList = new ArrayList<>();
 
-        productList.add(new Product("Cà chua hữu cơ", "45.000đ", "/500g", R.drawable.tomato, "ORGANIC"));
-        productList.add(new Product("Xà lách thủy canh", "32.000đ", "/ Bó", R.drawable.tomato, "THỦY CANH"));
-        productList.add(new Product("Cam sành", "55.000đ", "/ kg", R.drawable.tomato, "ĐẶC SẢN"));
-        productList.add(new Product("Nấm đùi gà", "60.000đ", "/ 250g", R.drawable.tomato, ""));
+        recyclerView =
+                findViewById(
+                        R.id.recyclerProducts
+                );
 
+        dbHelper =
+                DatabaseHelper.getInstance(
+                        this
+                );
+
+        loadProducts();
         adapter = new ProductAdapter(this, productList);
         recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(adapter);
@@ -86,6 +102,39 @@ public class ClientActivity extends AppCompatActivity {
              Intent intent = new Intent(ClientActivity.this, ProfileActivity.class);
              startActivity(intent);
         });
+    }
+
+    @Override
+    protected void onResume() {
+
+        super.onResume();
+
+        loadProducts();
+
+    }
+
+    private void loadProducts() {
+
+        productList =
+                dbHelper
+                        .getAllProducts();
+
+        adapter =
+                new ProductAdapter(
+                        this,
+                        productList
+                );
+
+        recyclerView.setLayoutManager(
+                new GridLayoutManager(
+                        this,
+                        2
+                )
+        );
+
+        recyclerView.setAdapter(
+                adapter
+        );
     }
 
     /**

@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.btl_ltuddd.MainActivity;
 import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.auth.LoginActivity;
+import com.example.btl_ltuddd.client.cart.CartActivity;
 import com.example.btl_ltuddd.client.dashboard.ClientActivity;
 import com.example.btl_ltuddd.client.listproduct.CategoriesActivity;
 import com.example.btl_ltuddd.client.profile.PersonalAddress.AddressActivity;
@@ -74,8 +75,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
 
         btnNavOrders.setOnClickListener(v ->
-                Toast.makeText(this, "Mở Đơn hàng", Toast.LENGTH_SHORT).show()
-        );
+        {
+            startActivity(new Intent(this, CartActivity.class));
+            finish();
+        });
 
         txtUserName = findViewById(R.id.txtUserName);
 

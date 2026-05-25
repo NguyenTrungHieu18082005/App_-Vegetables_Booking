@@ -17,15 +17,24 @@ import com.example.btl_ltuddd.R;
 import java.util.List;
 import android.content.Intent;
 import com.example.btl_ltuddd.client.listproduct.detail.ProductDetailActivity;
+import com.example.btl_ltuddd.model.Product;
 
 public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHolder> {
 
-    Context context;
-    List<Product> list;
+    private Context context;
 
-    public ProductAdapter(Context context, List<Product> list) {
-        this.context = context;
-        this.list = list;
+    private List<Product> productList;
+
+    public ProductAdapter(
+            Context context,
+            List<Product> productList
+    ) {
+
+        this.context =
+                context;
+
+        this.productList =
+                productList;
     }
 
     @NonNull
@@ -38,64 +47,98 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(
+            ViewHolder holder,
+            int position
+    ) {
 
-        Product product = list.get(position);
+        Product product =
+                productList.get(
+                        position
+                );
 
-        holder.imgProduct.setImageResource(product.getImage());
-        holder.txtName.setText(product.getName());
-        holder.txtPrice.setText(product.getPrice());
-        holder.txtUnit.setText(product.getUnit());
-        holder.txtTag.setText(product.getTag());
+        holder.txtName.setText(
+                product.getName()
+        );
 
-        if(product.getTag().isEmpty()){
-            holder.txtTag.setVisibility(View.GONE);
+        holder.txtPrice.setText(
+                String.format(
+                        "%.0fđ",
+                        product.getPrice()
+                )
+        );
+
+        holder.txtUnit.setText(
+                "/ " +
+                        product.getUnit()
+        );
+
+//        holder.txtBadge.setText(
+//                product.getCategory()
+//        );
+
+        if (
+                product.getImageUrl() != null
+        ) {
+
+            holder.imgProduct.setImageURI(
+                    android.net.Uri.parse(
+                            product.getImageUrl()
+                    )
+            );
         }
 
-        // =======================================================
-        // XỬ LÝ SỰ KIỆN CLICK NÚT THÊM VÀO GIỎ HÀNG (DẤU CỘNG XANH)
-        // =======================================================
-        holder.btnAdd.setOnClickListener(v -> {
-            // Lấy tên và giá của sản phẩm tại vị trí được bấm
-            String productName = product.getName();
-            String productPrice = product.getPrice();
-
-            // Hiển thị thông báo kiểm tra (Bạn có thể đổi đoạn này thành logic lưu SQLite/SharePrefs sau)
-            Toast.makeText(context, "Đã thêm " + productName + " vào giỏ hàng!", Toast.LENGTH_SHORT).show();
-        });
-
-        // Click vào card → sang ProductDetailActivity
-        holder.itemView.setOnClickListener(v -> {
-            Intent intent = new Intent(context, ProductDetailActivity.class);
-            intent.putExtra("name", product.getName());
-            intent.putExtra("price", product.getPrice());
-            intent.putExtra("unit", product.getUnit());
-            intent.putExtra("image", product.getImage());
-            intent.putExtra("tag", product.getTag());
-            context.startActivity(intent);
-        });
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return productList.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder
+            extends RecyclerView.ViewHolder {
 
         ImageView imgProduct;
-        TextView txtName, txtPrice, txtUnit, txtTag;
-        ImageButton btnAdd;
 
-        public ViewHolder(@NonNull View itemView) {
+        TextView txtName;
+
+        TextView txtPrice;
+
+        TextView txtUnit;
+
+//        TextView txtBadge;
+
+        ViewHolder(
+                View itemView
+        ) {
+
             super(itemView);
 
-            imgProduct = itemView.findViewById(R.id.imgProduct);
-            txtName = itemView.findViewById(R.id.txtName);
-            txtPrice = itemView.findViewById(R.id.txtPrice);
-            txtUnit = itemView.findViewById(R.id.txtUnit);
-            txtTag = itemView.findViewById(R.id.txtTag);
-            btnAdd = itemView.findViewById(R.id.btnAdd); // Đã ánh xạ chính xác nút bấm của bạn
+            imgProduct =
+                    itemView.findViewById(
+                            R.id.imgProduct
+                    );
+
+            txtName =
+                    itemView.findViewById(
+                            R.id.txtName
+                    );
+
+            txtPrice =
+                    itemView.findViewById(
+                            R.id.txtPrice
+                    );
+
+            txtUnit =
+                    itemView.findViewById(
+                            R.id.txtUnit
+                    );
+
+//            txtBadge =
+//                    itemView.findViewById(
+//                            R.id.txtBadge
+//                    );
+
         }
     }
 }

@@ -7,11 +7,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.btl_ltuddd.client.dashboard.ProductAdapter;
 import com.example.btl_ltuddd.model.Order;
 import com.example.btl_ltuddd.model.Product;
 import java.util.ArrayList;
 import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
+
+    ProductAdapter adapter;
+    List<Product> productList;
+    DatabaseHelper dbHelper;
 
     public static final String DB_NAME    = "hoaquasach.db";
     private static final int    DB_VERSION = 2;
@@ -258,14 +263,92 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     // Lấy tất cả sản phẩm
     public List<Product> getAllProducts() {
-        List<Product> list = new ArrayList<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM products ORDER BY name ASC", null);
-        while (cursor.moveToNext()) {
-            list.add(cursorToProduct(cursor));
+
+        List<Product> products =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                this.getReadableDatabase();
+
+        Cursor cursor =
+                db.rawQuery(
+                        "SELECT * FROM products WHERE is_visible = 1",
+                        null
+                );
+
+        if (cursor.moveToFirst()) {
+
+            do {
+
+                Product p =
+                        new Product();
+
+                p.setId(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("id")
+                        )
+                );
+
+                p.setName(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("name")
+                        )
+                );
+
+                p.setPrice(
+                        cursor.getDouble(
+                                cursor.getColumnIndexOrThrow("price")
+                        )
+                );
+
+                p.setDescription(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("description")
+                        )
+                );
+
+                p.setCategory(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("category")
+                        )
+                );
+
+                p.setImageUrl(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("image_url")
+                        )
+                );
+
+                p.setStock(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("stock")
+                        )
+                );
+
+                p.setUnit(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("unit")
+                        )
+                );
+
+                p.setVisible(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("is_visible")
+                        ) == 1
+                );
+
+                products.add(p);
+
+            }
+
+            while (
+                    cursor.moveToNext()
+            );
         }
+
         cursor.close();
-        return list;
+
+        return products;
     }
 
     // Tìm kiếm theo tên
@@ -407,6 +490,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
 
         return name;
+
+
     }
+
+
 }
 
