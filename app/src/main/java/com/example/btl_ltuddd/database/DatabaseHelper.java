@@ -6,15 +6,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.Cursor;
-import android.content.ContentValues;
+
+import com.example.btl_ltuddd.model.Order;
 import com.example.btl_ltuddd.model.Product;
 import java.util.ArrayList;
 import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    private static final String DB_NAME    = "hoaquasach.db";
-    private static final int    DB_VERSION = 1;
+    public static final String DB_NAME    = "hoaquasach.db";
+    private static final int    DB_VERSION = 2;
 
     // Bảng users
     public static final String TABLE_USERS = "users";
@@ -39,6 +39,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // Thêm vào phần khai báo constants
     public static final String COL_P_UNIT    = "unit";
     public static final String COL_P_VISIBLE = "is_visible";
+
+    // ── BƯỚC 2: Thêm constants (sau phần constants products) ─────────
+    public static final String TABLE_ORDERS     = "orders";
+    public static final String COL_O_ID         = "id";
+    public static final String COL_O_CODE       = "order_code";
+    public static final String COL_O_CUST_NAME  = "customer_name";
+    public static final String COL_O_CUST_PHONE = "customer_phone";
+    public static final String COL_O_TOTAL      = "total_amount";
+    public static final String COL_O_STATUS     = "status";
+    public static final String COL_O_CREATED    = "created_at";
+    public static final String COL_O_ADDRESS    = "address";
 
     // Singleton — dùng chung 1 instance trong toàn app
     public static synchronized DatabaseHelper getInstance(Context context) {
@@ -72,6 +83,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_P_STOCK    + " INTEGER DEFAULT 0, "
                 + COL_P_UNIT     + " TEXT, "
                 + COL_P_VISIBLE  + " INTEGER DEFAULT 1"
+                + ")");
+
+        db.execSQL("CREATE TABLE " + TABLE_ORDERS + " ("
+                + COL_O_ID         + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_O_CODE       + " TEXT, "
+                + COL_O_CUST_NAME  + " TEXT NOT NULL, "
+                + COL_O_CUST_PHONE + " TEXT, "
+                + COL_O_TOTAL      + " REAL NOT NULL, "
+                + COL_O_STATUS     + " TEXT DEFAULT 'pending', "
+                + COL_O_CREATED    + " TEXT, "
+                + COL_O_ADDRESS    + " TEXT"
                 + ")");
 
 
@@ -262,6 +284,100 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     // Helper
+
+    // Order Admin
+    public long addOrder(String customerName, String customerPhone,
+                         double totalAmount, String address) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_O_CUST_NAME,  customerName);
+        values.put(COL_O_CUST_PHONE, customerPhone);
+        values.put(COL_O_TOTAL,      totalAmount);
+        values.put(COL_O_STATUS,     "pending");
+        values.put(COL_O_ADDRESS,    address);
+        values.put(COL_O_CREATED,    getCurrentDateTime());
+        long id = db.insert(TABLE_ORDERS, null, values);
+        // Cập nhật mã đơn #FH-xxxx
+        ContentValues cv2 = new ContentValues();
+        cv2.put(COL_O_CODE, "#FH-" + String.format("%04d", id));
+        db.update(TABLE_ORDERS, cv2, COL_O_ID + "=?", new String[]{String.valueOf(id)});
+        return id;
+    }
+
+    public int updateOrderStatus(int id, String status) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_O_STATUS, status);
+        return db.update(TABLE_ORDERS, values,
+                COL_O_ID + "=?", new String[]{String.valueOf(id)});
+    }
+
+    public boolean deleteOrder(int id) {
+        return getWritableDatabase().delete(TABLE_ORDERS,
+                COL_O_ID + "=?", new String[]{String.valueOf(id)}) > 0;
+    }
+
+    public List<Order> getAllOrders() {
+        return queryOrders("SELECT * FROM " + TABLE_ORDERS
+                + " ORDER BY " + COL_O_ID + " DESC", null);
+    }
+
+    public List<Order> getOrdersByStatus(String status) {
+        return queryOrders("SELECT * FROM " + TABLE_ORDERS
+                + " WHERE " + COL_O_STATUS + "=?"
+                + " ORDER BY " + COL_O_ID + " DESC", new String[]{status});
+    }
+
+    public List<Order> searchOrders(String query) {
+        String like = "%" + query + "%";
+        return queryOrders("SELECT * FROM " + TABLE_ORDERS
+                + " WHERE " + COL_O_CODE + " LIKE ? OR "
+                + COL_O_CUST_NAME + " LIKE ?"
+                + " ORDER BY " + COL_O_ID + " DESC", new String[]{like, like});
+    }
+
+    public int getOrderCount()         { return orderCountByStatus(null); }
+    public int getPendingOrderCount()  { return orderCountByStatus("pending"); }
+    public int getShippingOrderCount() { return orderCountByStatus("shipping"); }
+    public int getDoneOrderCount()     { return orderCountByStatus("done"); }
+
+    private int orderCountByStatus(String status) {
+        SQLiteDatabase db = getReadableDatabase();
+        String sql  = status == null
+                ? "SELECT COUNT(*) FROM " + TABLE_ORDERS
+                : "SELECT COUNT(*) FROM " + TABLE_ORDERS + " WHERE status=?";
+        String[] args = status == null ? null : new String[]{status};
+        Cursor c = db.rawQuery(sql, args);
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
+    private List<Order> queryOrders(String sql, String[] args) {
+        List<Order> list = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(sql, args);
+        while (c.moveToNext()) {
+            list.add(new Order(
+                    c.getInt(c.getColumnIndexOrThrow(COL_O_ID)),
+                    c.getString(c.getColumnIndexOrThrow(COL_O_CODE)),
+                    c.getString(c.getColumnIndexOrThrow(COL_O_CUST_NAME)),
+                    c.getString(c.getColumnIndexOrThrow(COL_O_CUST_PHONE)),
+                    c.getDouble(c.getColumnIndexOrThrow(COL_O_TOTAL)),
+                    c.getString(c.getColumnIndexOrThrow(COL_O_STATUS)),
+                    c.getString(c.getColumnIndexOrThrow(COL_O_CREATED)),
+                    c.getString(c.getColumnIndexOrThrow(COL_O_ADDRESS))
+            ));
+        }
+        c.close();
+        return list;
+    }
+
+    private String getCurrentDateTime() {
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date());
+    }
 
 
 

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.admin.fragment.AdminDashboardFragment;
+import com.example.btl_ltuddd.admin.order.AdminOrderActivity;
 import com.example.btl_ltuddd.admin.product.AdminProductActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -38,8 +39,8 @@ public class AdminActivity extends AppCompatActivity {
                 return true;  // ← KHÔNG có finish()
             }
             else if (id == R.id.nav_orders) {
-                // TODO: OrdersFragment
-                return true;
+                startActivity(new Intent(this, AdminOrderActivity.class));
+                return true;  // ← KHÔNG có finish()
             } else if (id == R.id.nav_profile) {
                 // TODO: ProfileFragment
                 return true;

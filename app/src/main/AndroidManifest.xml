@@ -11,6 +11,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.BTL_LTUDDD">
+
+        <activity
+            android:name=".admin.order.AdminOrderActivity"
+            android:exported="false" />
         <activity
             android:name=".admin.product.addeditproduct.AddEditProductActivity"
             android:exported="false" />
