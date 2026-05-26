@@ -28,7 +28,7 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.ViewHolder> 
         holder.tvCode.setText(o.getOrderCode());
         holder.tvDate.setText(o.getCreatedAt());
         holder.tvName.setText(o.getCustomerName());
-        holder.tvTotal.setText(String.format("%,.0fđ", o.getTotalAmount()));
+        holder.tvTotal.setText(String.format("%,.0fđ", o.getTotal()));
 
         // Lấy 2 chữ cái đầu của tên khách để làm avatar
         String name = o.getCustomerName();

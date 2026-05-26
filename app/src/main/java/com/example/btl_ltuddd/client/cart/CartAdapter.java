@@ -1,7 +1,6 @@
 package com.example.btl_ltuddd.client.cart;
 
 import android.content.Context;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.btl_ltuddd.R;
-import com.example.btl_ltuddd.model.Product;
+import com.example.btl_ltuddd.database.DatabaseHelper;
+import com.example.btl_ltuddd.model.Cart;
 
 import java.util.List;
 
@@ -21,16 +21,34 @@ public class CartAdapter
 
     private Context context;
 
-    private List<Product> list;
+    private List<Cart> list;
+
+    private DatabaseHelper db;
+
+    // callback báo về Activity cập nhật tổng tiền
+    public interface CartListener {
+        void onCartChanged();
+    }
+
+    private CartListener listener;
 
     public CartAdapter(
             Context context,
-            List<Product> list
+            List<Cart> list,
+            CartListener listener
     ) {
 
         this.context = context;
 
         this.list = list;
+
+        this.listener = listener;
+
+        db =
+                DatabaseHelper.getInstance(
+                        context
+                );
+
     }
 
     @NonNull
@@ -50,6 +68,7 @@ public class CartAdapter
                         );
 
         return new ViewHolder(view);
+
     }
 
     @Override
@@ -58,92 +77,92 @@ public class CartAdapter
             int position
     ) {
 
-        Product product =
+        Cart item =
                 list.get(position);
 
+        // hiện dữ liệu
         holder.txtCartName.setText(
-                product.getName()
+                item.getProductName()
         );
 
         holder.txtCartPrice.setText(
+
                 String.format(
                         "%,.0fđ",
-                        product.getPrice()
+                        item.getProductPrice()
                 )
+
         );
 
         holder.txtCartUnit.setText(
-                product.getUnit()
+                item.getProductUnit()
         );
-
-        if (
-                product.getImageUrl() != null
-                        &&
-                        !product.getImageUrl().isEmpty()
-        ) {
-
-            holder.imgCartProduct.setImageURI(
-                    Uri.parse(
-                            product.getImageUrl()
-                    )
-            );
-        }
-
-        final int[] quantity = {1};
 
         holder.txtQuantity.setText(
                 String.valueOf(
-                        quantity[0]
+                        item.getQuantity()
                 )
         );
 
+        // tăng SL
         holder.btnPlus.setOnClickListener(v -> {
 
-            quantity[0]++;
+            int qty =
+                    item.getQuantity()
+                            + 1;
 
-            holder.txtQuantity.setText(
-                    String.valueOf(
-                            quantity[0]
-                    )
+            item.setQuantity(qty);
+
+            db.updateCartQuantity(
+                    item.getId(),
+                    qty
             );
+
+            notifyItemChanged(position);
+
+            listener.onCartChanged();
+
         });
 
+        // giảm SL
         holder.btnMinus.setOnClickListener(v -> {
 
-            if (quantity[0] > 1) {
-
-                quantity[0]--;
-
-                holder.txtQuantity.setText(
-                        String.valueOf(
-                                quantity[0]
-                        )
-                );
-            }
-        });
-
-        holder.btnDelete.setOnClickListener(v -> {
-
-            int current =
-                    holder.getAdapterPosition();
-
             if (
-                    current
-                            !=
-                            RecyclerView.NO_POSITION
+                    item.getQuantity()
+                            > 1
             ) {
 
-                list.remove(current);
+                int qty =
+                        item.getQuantity()
+                                - 1;
 
-                notifyItemRemoved(
-                        current
+                item.setQuantity(qty);
+
+                db.updateCartQuantity(
+                        item.getId(),
+                        qty
                 );
 
-                notifyItemRangeChanged(
-                        current,
-                        list.size()
-                );
+                notifyItemChanged(position);
+
+                listener.onCartChanged();
+
             }
+
+        });
+
+        // xoá
+        holder.btnDelete.setOnClickListener(v -> {
+
+            db.deleteCart(
+                    item.getId()
+            );
+
+            list.remove(position);
+
+            notifyItemRemoved(position);
+
+            listener.onCartChanged();
 
         });
 
@@ -156,7 +175,7 @@ public class CartAdapter
 
     }
 
-    public static class ViewHolder
+    static class ViewHolder
             extends RecyclerView.ViewHolder {
 
         ImageView imgCartProduct;
@@ -175,8 +194,8 @@ public class CartAdapter
 
         TextView btnMinus;
 
-        public ViewHolder(
-                @NonNull View itemView
+        ViewHolder(
+                View itemView
         ) {
 
             super(itemView);
@@ -184,6 +203,11 @@ public class CartAdapter
             imgCartProduct =
                     itemView.findViewById(
                             R.id.imgCartProduct
+                    );
+
+            btnDelete =
+                    itemView.findViewById(
+                            R.id.btnDelete
                     );
 
             txtCartName =
@@ -216,10 +240,8 @@ public class CartAdapter
                             R.id.btnMinus
                     );
 
-            btnDelete =
-                    itemView.findViewById(
-                            R.id.btnDelete
-                    );
         }
+
     }
+
 }

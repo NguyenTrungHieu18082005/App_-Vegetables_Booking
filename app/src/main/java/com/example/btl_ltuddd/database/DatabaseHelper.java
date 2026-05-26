@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.btl_ltuddd.client.dashboard.ProductAdapter;
+import com.example.btl_ltuddd.model.Cart;
 import com.example.btl_ltuddd.model.Order;
 import com.example.btl_ltuddd.model.Product;
 import java.util.ArrayList;
@@ -57,6 +58,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COL_O_ADDRESS    = "address";
 
     private static final String TABLE_CART = "cart";
+
+    public static final String TABLE_ORDER_ITEMS="order_items";
+
+    public static final String COL_ITEM_ID="id";
+
+    public static final String COL_ORDER_ID="order_id";
+
+    public static final String COL_PRODUCT_ID="product_id";
+
+    public static final String COL_QTY="quantity";
+
+    public static final String COL_PRICE="price";
 
 
 
@@ -126,6 +139,38 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         ")";
 
         db.execSQL(createCart);
+
+        db.execSQL(
+
+                "CREATE TABLE " +
+
+                        TABLE_ORDER_ITEMS +
+
+                        "(" +
+
+                        COL_ITEM_ID +
+
+                        " INTEGER PRIMARY KEY AUTOINCREMENT," +
+
+                        COL_ORDER_ID +
+
+                        " INTEGER," +
+
+                        COL_PRODUCT_ID +
+
+                        " INTEGER," +
+
+                        COL_QTY +
+
+                        " INTEGER," +
+
+                        COL_PRICE +
+
+                        " REAL" +
+
+                        ")"
+
+        );
 
 
     }
@@ -541,6 +586,91 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     }
 
+    /**
+     * Lấy thông tin đầy đủ user theo id (fullname, email, phone)
+     * Trả về mảng [fullname, email, phone] hoặc null nếu không tìm thấy
+     */
+    public String[] getUserById(long userId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(
+                TABLE_USERS,
+                new String[]{COL_FULLNAME, COL_EMAIL, COL_PHONE},
+                COL_ID + "=?",
+                new String[]{String.valueOf(userId)},
+                null, null, null
+        );
+        String[] result = null;
+        if (cursor.moveToFirst()) {
+            result = new String[]{
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_FULLNAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_EMAIL)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_PHONE))
+            };
+        }
+        cursor.close();
+        return result;
+    }
+
+    /**
+     * Đặt hàng: tạo order + lưu order_items + xóa giỏ hàng
+     *
+     * @param userId      id người dùng
+     * @param cartItems   danh sách sản phẩm trong giỏ
+     * @param subtotal    tổng tiền hàng
+     * @param total       tổng cuối (subtotal + ship)
+     * @return orderId nếu thành công, -1 nếu thất bại
+     */
+    public long placeOrder(int userId, java.util.List<com.example.btl_ltuddd.model.Cart> cartItems,
+                           double subtotal, double total) {
+        // Lấy thông tin user
+        String[] userInfo = getUserById(userId);
+        if (userInfo == null) return -1;
+
+        String customerName  = userInfo[0];
+        String customerPhone = (userInfo[2] != null) ? userInfo[2] : "";
+        String address       = "";  // Có thể mở rộng sau
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // 1. Tạo đơn hàng
+            ContentValues orderValues = new ContentValues();
+            orderValues.put(COL_O_CUST_NAME,  customerName);
+            orderValues.put(COL_O_CUST_PHONE, customerPhone);
+            orderValues.put(COL_O_TOTAL,      total);
+            orderValues.put(COL_O_STATUS,     "pending");
+            orderValues.put(COL_O_ADDRESS,    address);
+            orderValues.put(COL_O_CREATED,    getCurrentDateTime());
+
+            long orderId = db.insert(TABLE_ORDERS, null, orderValues);
+            if (orderId == -1) return -1;
+
+            // Cập nhật mã đơn #FH-xxxx
+            ContentValues codeValues = new ContentValues();
+            codeValues.put(COL_O_CODE, "#FH-" + String.format("%04d", orderId));
+            db.update(TABLE_ORDERS, codeValues, COL_O_ID + "=?",
+                    new String[]{String.valueOf(orderId)});
+
+            // 2. Lưu từng sản phẩm vào order_items
+            for (com.example.btl_ltuddd.model.Cart item : cartItems) {
+                ContentValues itemValues = new ContentValues();
+                itemValues.put(COL_ORDER_ID,   orderId);
+                itemValues.put(COL_PRODUCT_ID, item.getProductId());
+                itemValues.put(COL_QTY,        item.getQuantity());
+                itemValues.put(COL_PRICE,      item.getProductPrice());
+                db.insert(TABLE_ORDER_ITEMS, null, itemValues);
+            }
+
+            // 3. Xóa giỏ hàng của user
+            db.delete("cart", "user_id=?", new String[]{String.valueOf(userId)});
+
+            db.setTransactionSuccessful();
+            return orderId;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
     // Hàm thêm vào giỏ hàng
 
     // Hàm thêm vào giỏ hàng
@@ -648,9 +778,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 
     // Lấy sản phẩm trong giỏ hàng
-    public List<Product> getCartProducts(
-            int userId
-    ) {
+    public List<Product> getCartProducts(int userId) {
 
         List<Product> list =
                 new ArrayList<>();
@@ -658,57 +786,84 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase db =
                 getReadableDatabase();
 
+        String sql =
+
+                "SELECT " +
+                        "p.*, " +
+                        "c.quantity " +
+
+                        "FROM cart c " +
+
+                        "INNER JOIN products p " +
+
+                        "ON c.product_id = p.id " +
+
+                        "WHERE c.user_id = ?";
+
         Cursor cursor =
                 db.rawQuery(
-
-                        "SELECT p.* " +
-
-                                "FROM cart c " +
-
-                                "INNER JOIN products p " +
-
-                                "ON c.product_id = p.id " +
-
-                                "WHERE c.user_id=?",
-
+                        sql,
                         new String[]{
-
-                                String.valueOf(
-                                        userId
-                                )
-
+                                String.valueOf(userId)
                         }
-
                 );
 
-        if (
-                cursor.moveToFirst()
-        ) {
+        if (cursor.moveToFirst()) {
 
             do {
 
                 Product product =
-                        cursorToProduct(
-                                cursor
-                        );
+                        new Product();
 
-                list.add(
-                        product
+                product.setId(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("id")
+                        )
                 );
+
+                product.setName(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("name")
+                        )
+                );
+
+                product.setPrice(
+                        cursor.getDouble(
+                                cursor.getColumnIndexOrThrow("price")
+                        )
+                );
+
+                product.setImageUrl(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("image_url")
+                        )
+                );
+
+                product.setUnit(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("unit")
+                        )
+                );
+
+                product.setQuantity(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("quantity")
+                        )
+                );
+
+                list.add(product);
 
             }
 
             while (
                     cursor.moveToNext()
             );
-
         }
 
         cursor.close();
 
         return list;
     }
-
 
 
     // Xóa sản phẩm khỏi giỏ
@@ -773,6 +928,163 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         );
 
     }
+
+    //Hàm update số lượng
+    public void updateCartQuantity(
+            int cartId,
+            int quantity
+    ){
+
+        SQLiteDatabase db =
+                getWritableDatabase();
+
+        ContentValues cv =
+                new ContentValues();
+
+        cv.put(
+                "quantity",
+                quantity
+        );
+
+        db.update(
+                "cart",
+                cv,
+                "id=?",
+                new String[]{
+                        String.valueOf(cartId)
+                }
+        );
+
+    }
+
+
+    public void deleteCart(
+            int cartId
+    ){
+
+        getWritableDatabase().delete(
+                "cart",
+                "id=?",
+                new String[]{
+                        String.valueOf(cartId)
+                }
+        );
+
+    }
+
+    //Data base trả về list <Cart>
+    public List<Cart> getCartItems(
+            int userId
+    ) {
+
+        List<Cart> list =
+                new ArrayList<>();
+
+        SQLiteDatabase db =
+                getReadableDatabase();
+
+        Cursor cursor =
+                db.rawQuery(
+
+                        "SELECT " +
+                                "c.id," +
+                                "c.user_id," +
+                                "c.product_id," +
+                                "c.quantity," +
+                                "p.name," +
+                                "p.price," +
+                                "p.image_url," +
+                                "p.unit " +
+                                "FROM cart c " +
+                                "INNER JOIN products p " +
+                                "ON c.product_id = p.id " +
+                                "WHERE c.user_id=?",
+
+                        new String[]{
+
+                                String.valueOf(
+                                        userId
+                                )
+
+                        }
+
+                );
+
+        if (
+                cursor.moveToFirst()
+        ) {
+
+            do {
+
+                Cart cart =
+                        new Cart();
+
+                cart.setId(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("id")
+                        )
+                );
+
+                cart.setUserId(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("user_id")
+                        )
+                );
+
+                cart.setProductId(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("product_id")
+                        )
+                );
+
+                cart.setQuantity(
+                        cursor.getInt(
+                                cursor.getColumnIndexOrThrow("quantity")
+                        )
+                );
+
+                cart.setProductName(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("name")
+                        )
+                );
+
+                cart.setProductPrice(
+                        cursor.getDouble(
+                                cursor.getColumnIndexOrThrow("price")
+                        )
+                );
+
+                cart.setProductImage(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("image_url")
+                        )
+                );
+
+                cart.setProductUnit(
+                        cursor.getString(
+                                cursor.getColumnIndexOrThrow("unit")
+                        )
+                );
+
+                list.add(
+                        cart
+                );
+
+            }
+
+            while (
+                    cursor.moveToNext()
+            );
+
+        }
+
+        cursor.close();
+
+        return list;
+    }
+
+    // Làm với khi khách hàng đặt hàng
 
 }
 

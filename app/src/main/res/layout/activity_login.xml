@@ -35,7 +35,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Freshness delivered from our local farms\ndirectly to your kitchen."
+            android:text="Thực phẩm tươi ngon từ Trang Trại địa phương"
             android:textSize="14sp"
             android:textColor="#666666"
             android:gravity="center"
@@ -64,7 +64,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Welcome Back"
+                    android:text="Xin Chào"
                     android:textSize="22sp"
                     android:textStyle="bold"
                     android:textColor="#1A1A1A"
@@ -74,7 +74,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Email or Phone Number"
+                    android:text="Email hoặc SĐT"
                     android:textSize="13sp"
                     android:textStyle="bold"
                     android:textColor="#212121"
@@ -101,7 +101,7 @@
                         android:id="@+id/edtEmailOrPhone"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:hint="Enter your email or phone"
+                        android:hint="Nhập Email hoặc SĐT"
                         android:textColorHint="#AAAAAA"
                         android:textColor="#212121"
                         android:textSize="15sp"
@@ -122,7 +122,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Password"
+                        android:text="Mật Khẩu"
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:textColor="#212121" />
@@ -131,7 +131,7 @@
                         android:id="@+id/tvForgotPassword"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Forgot Password?"
+                        android:text="Quên Mật Khẩu?"
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:textColor="#2E7D32"
@@ -161,7 +161,7 @@
                         android:layout_width="0dp"
                         android:layout_height="match_parent"
                         android:layout_weight="1"
-                        android:text="········"
+                        android:hint="········"
                         android:textColor="#AAAAAA"
                         android:textSize="20sp"
                         android:inputType="textPassword"
@@ -208,7 +208,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="  Or continue with  "
+                        android:text="  tiếp tục với  "
                         android:textSize="13sp"
                         android:textColor="#888888" />
 
@@ -328,7 +328,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Don't have an account? "
+                android:text="Bạn chưa có Tài Khoản? "
                 android:textSize="14sp"
                 android:textColor="#555555" />
 
@@ -336,7 +336,7 @@
                 android:id="@+id/tvSignUp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sign Up"
+                android:text="Đăng Ký"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:textColor="#1B5E20"

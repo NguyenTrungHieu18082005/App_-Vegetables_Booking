@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.admin.AdminActivity;
+import com.example.btl_ltuddd.admin.order.AdminOrderActivity;
 import com.example.btl_ltuddd.admin.product.addeditproduct.AddEditProductActivity;
 import com.example.btl_ltuddd.database.DatabaseHelper;
 import com.example.btl_ltuddd.model.Product;
@@ -94,6 +95,19 @@ public class AdminProductActivity extends AppCompatActivity implements ProductAd
                 finish();
                 return true;
             }
+
+            if (id == R.id.nav_orders) {
+                startActivity(new Intent(this, AdminOrderActivity.class));
+                finish();
+                return true;
+            }
+
+            if (id == R.id.nav_profile) {
+                startActivity(new Intent(this, AdminOrderActivity.class));
+                finish();
+                return true;
+            }
+
             return id == R.id.nav_categories;
         });
     }
