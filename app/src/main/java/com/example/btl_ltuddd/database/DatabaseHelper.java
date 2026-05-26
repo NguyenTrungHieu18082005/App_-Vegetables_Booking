@@ -11,8 +11,11 @@ import com.example.btl_ltuddd.client.dashboard.ProductAdapter;
 import com.example.btl_ltuddd.model.Cart;
 import com.example.btl_ltuddd.model.Order;
 import com.example.btl_ltuddd.model.Product;
+import com.example.btl_ltuddd.model.User;
+
 import java.util.ArrayList;
 import java.util.List;
+
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     ProductAdapter adapter;
@@ -42,11 +45,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static DatabaseHelper instance;
 
-    // Thêm vào phần khai báo constants
     public static final String COL_P_UNIT    = "unit";
     public static final String COL_P_VISIBLE = "is_visible";
 
-    // ── BƯỚC 2: Thêm constants (sau phần constants products) ─────────
     public static final String TABLE_ORDERS     = "orders";
     public static final String COL_O_ID         = "id";
     public static final String COL_O_CODE       = "order_code";
@@ -59,21 +60,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     private static final String TABLE_CART = "cart";
 
-    public static final String TABLE_ORDER_ITEMS="order_items";
+    public static final String TABLE_ORDER_ITEMS = "order_items";
+    public static final String COL_ITEM_ID       = "id";
+    public static final String COL_ORDER_ID      = "order_id";
+    public static final String COL_PRODUCT_ID    = "product_id";
+    public static final String COL_QTY           = "quantity";
+    public static final String COL_PRICE         = "price";
 
-    public static final String COL_ITEM_ID="id";
-
-    public static final String COL_ORDER_ID="order_id";
-
-    public static final String COL_PRODUCT_ID="product_id";
-
-    public static final String COL_QTY="quantity";
-
-    public static final String COL_PRICE="price";
-
-
-
-    // Singleton — dùng chung 1 instance trong toàn app
+    // Singleton
     public static synchronized DatabaseHelper getInstance(Context context) {
         if (instance == null) {
             instance = new DatabaseHelper(context.getApplicationContext());
@@ -118,90 +112,35 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_O_ADDRESS    + " TEXT"
                 + ")");
 
-        String createCart =
+        db.execSQL("CREATE TABLE " + TABLE_CART + "("
+                + "id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + "user_id INTEGER NOT NULL,"
+                + "product_id INTEGER NOT NULL,"
+                + "quantity INTEGER DEFAULT 1,"
+                + "created_at DATETIME DEFAULT CURRENT_TIMESTAMP,"
+                + "FOREIGN KEY(user_id) REFERENCES users(id),"
+                + "FOREIGN KEY(product_id) REFERENCES products(id)"
+                + ")");
 
-                "CREATE TABLE " + TABLE_CART + "(" +
-
-                        "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-
-                        "user_id INTEGER NOT NULL," +
-
-                        "product_id INTEGER NOT NULL," +
-
-                        "quantity INTEGER DEFAULT 1," +
-
-                        "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
-
-                        "FOREIGN KEY(user_id) REFERENCES users(id)," +
-
-                        "FOREIGN KEY(product_id) REFERENCES products(id)" +
-
-                        ")";
-
-        db.execSQL(createCart);
-
-        db.execSQL(
-
-                "CREATE TABLE " +
-
-                        TABLE_ORDER_ITEMS +
-
-                        "(" +
-
-                        COL_ITEM_ID +
-
-                        " INTEGER PRIMARY KEY AUTOINCREMENT," +
-
-                        COL_ORDER_ID +
-
-                        " INTEGER," +
-
-                        COL_PRODUCT_ID +
-
-                        " INTEGER," +
-
-                        COL_QTY +
-
-                        " INTEGER," +
-
-                        COL_PRICE +
-
-                        " REAL" +
-
-                        ")"
-
-        );
-
-
+        db.execSQL("CREATE TABLE " + TABLE_ORDER_ITEMS + "("
+                + COL_ITEM_ID    + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COL_ORDER_ID   + " INTEGER,"
+                + COL_PRODUCT_ID + " INTEGER,"
+                + COL_QTY        + " INTEGER,"
+                + COL_PRICE      + " REAL"
+                + ")");
     }
 
     @Override
-    public void onUpgrade(
-            SQLiteDatabase db,
-            int oldVersion,
-            int newVersion
-    ) {
-
-        db.execSQL(
-                "DROP TABLE IF EXISTS cart"
-        );
-
-        db.execSQL(
-                "DROP TABLE IF EXISTS orders"
-        );
-
-        db.execSQL(
-                "DROP TABLE IF EXISTS products"
-        );
-
-        db.execSQL(
-                "DROP TABLE IF EXISTS users"
-        );
-
-        onCreate(
-                db
-        );
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS cart");
+        db.execSQL("DROP TABLE IF EXISTS order_items");
+        db.execSQL("DROP TABLE IF EXISTS orders");
+        db.execSQL("DROP TABLE IF EXISTS products");
+        db.execSQL("DROP TABLE IF EXISTS users");
+        onCreate(db);
     }
+
     // ─── USER METHODS ──────────────────────────────────────────
 
     /** Đăng ký → trả về id nếu thành công, -1 nếu email đã tồn tại */
@@ -211,11 +150,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cv.put(COL_FULLNAME, fullName);
         cv.put(COL_PHONE,    phone);
         cv.put(COL_EMAIL,    email);
-        cv.put(COL_PASSWORD, password); // TODO: hash password (BCrypt/SHA-256) trước khi lưu
+        cv.put(COL_PASSWORD, password);
         try {
             return db.insertOrThrow(TABLE_USERS, null, cv);
         } catch (Exception e) {
-            return -1; // Email đã tồn tại (UNIQUE constraint)
+            return -1;
         }
     }
 
@@ -243,6 +182,46 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         c.close();
         return exists;
     }
+
+    /** Lấy User object theo id — trả null nếu không tìm thấy */
+    public User getUserById(long userId) {
+        SQLiteDatabase db = getReadableDatabase();  // FIX: khai báo db đúng cách
+        Cursor cursor = db.query(
+                TABLE_USERS,
+                new String[]{COL_ID, COL_FULLNAME, COL_EMAIL, COL_PHONE},
+                COL_ID + "=?",
+                new String[]{String.valueOf(userId)},
+                null, null, null
+        );
+        User user = null;
+        if (cursor.moveToFirst()) {
+            user = new User(
+                    cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_FULLNAME)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_PHONE)),
+                    cursor.getString(cursor.getColumnIndexOrThrow(COL_EMAIL)),
+                    null  // không trả password ra ngoài
+            );
+        }
+        cursor.close();
+        return user;
+    }
+
+    /** Trả về tên user theo id (dùng cho profile) */
+    public String getUserNameById(long userId) {
+        User user = getUserById(userId);
+        return user != null ? user.getFullname() : "";
+    }
+
+    public int getUserCount() {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_USERS, null);
+        int count = 0;
+        if (c.moveToFirst()) count = c.getInt(0);
+        c.close();
+        return count;
+    }
+
     // ─── PRODUCT METHODS ──────────────────────────────────────────
 
     public int getLowStockCount(int threshold) {
@@ -265,16 +244,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return count;
     }
 
-    public int getUserCount() {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT COUNT(*) FROM " + TABLE_USERS, null);
-        int count = 0;
-        if (c.moveToFirst()) count = c.getInt(0);
-        c.close();
-        return count;
-    }
-
-    // Thêm sản phẩm
     public long addProduct(String name, double price, String description,
                            String category, String imageUrl, int stock,
                            String unit, boolean isVisible) {
@@ -308,7 +277,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COL_P_ID + "=?", new String[]{String.valueOf(id)});
     }
 
-    // Sửa cursorToProduct()
     private Product cursorToProduct(Cursor cursor) {
         return new Product(
                 cursor.getInt(cursor.getColumnIndexOrThrow(COL_P_ID)),
@@ -322,135 +290,44 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 cursor.getInt(cursor.getColumnIndexOrThrow(COL_P_VISIBLE)) == 1
         );
     }
-    // Trong DatabaseHelper.java
-    public Product getProductById(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.query("products", null, "id = ?",
-                new String[]{String.valueOf(id)}, null, null, null);
 
+    public Product getProductById(int id) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.query(TABLE_PRODUCTS, null, "id = ?",
+                new String[]{String.valueOf(id)}, null, null, null);
         Product product = null;
         if (cursor != null && cursor.moveToFirst()) {
-            product = new Product(
-                    cursor.getInt(cursor.getColumnIndexOrThrow("id")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("name")),
-                    cursor.getDouble(cursor.getColumnIndexOrThrow("price")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("description")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("category")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("image_url")),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("stock")),
-                    cursor.getString(cursor.getColumnIndexOrThrow("unit")),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("is_visible")) == 1  // ✅ sửa ở đây
-            );
+            product = cursorToProduct(cursor);
             cursor.close();
         }
         return product;
     }
 
-
-    // Xóa sản phẩm
     public boolean deleteProduct(int id) {
-        SQLiteDatabase db = getWritableDatabase();
-        return db.delete("products", "id=?", new String[]{String.valueOf(id)}) > 0;
+        return getWritableDatabase().delete(TABLE_PRODUCTS,
+                "id=?", new String[]{String.valueOf(id)}) > 0;
     }
 
-    // Lấy tất cả sản phẩm
     public List<Product> getAllProducts() {
-
-        List<Product> products =
-                new ArrayList<>();
-
-        SQLiteDatabase db =
-                this.getReadableDatabase();
-
-        Cursor cursor =
-                db.rawQuery(
-                        "SELECT * FROM products WHERE is_visible = 1",
-                        null
-                );
-
+        List<Product> products = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT * FROM products WHERE is_visible = 1", null);
         if (cursor.moveToFirst()) {
-
             do {
-
-                Product p =
-                        new Product();
-
-                p.setId(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("id")
-                        )
-                );
-
-                p.setName(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("name")
-                        )
-                );
-
-                p.setPrice(
-                        cursor.getDouble(
-                                cursor.getColumnIndexOrThrow("price")
-                        )
-                );
-
-                p.setDescription(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("description")
-                        )
-                );
-
-                p.setCategory(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("category")
-                        )
-                );
-
-                p.setImageUrl(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("image_url")
-                        )
-                );
-
-                p.setStock(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("stock")
-                        )
-                );
-
-                p.setUnit(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("unit")
-                        )
-                );
-
-                p.setVisible(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("is_visible")
-                        ) == 1
-                );
-
-                products.add(p);
-
-            }
-
-            while (
-                    cursor.moveToNext()
-            );
+                products.add(cursorToProduct(cursor));
+            } while (cursor.moveToNext());
         }
-
         cursor.close();
-
         return products;
     }
 
-    // Tìm kiếm theo tên
     public List<Product> searchProducts(String query) {
         List<Product> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery(
                 "SELECT * FROM products WHERE name LIKE ? ORDER BY name ASC",
-                new String[]{"%" + query + "%"}
-        );
+                new String[]{"%" + query + "%"});
         while (cursor.moveToNext()) {
             list.add(cursorToProduct(cursor));
         }
@@ -458,9 +335,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // Helper
+    // ─── ORDER METHODS ──────────────────────────────────────────
 
-    // Order Admin
     public long addOrder(String customerName, String customerPhone,
                          double totalAmount, String address) {
         SQLiteDatabase db = getWritableDatabase();
@@ -472,7 +348,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COL_O_ADDRESS,    address);
         values.put(COL_O_CREATED,    getCurrentDateTime());
         long id = db.insert(TABLE_ORDERS, null, values);
-        // Cập nhật mã đơn #FH-xxxx
         ContentValues cv2 = new ContentValues();
         cv2.put(COL_O_CODE, "#FH-" + String.format("%04d", id));
         db.update(TABLE_ORDERS, cv2, COL_O_ID + "=?", new String[]{String.valueOf(id)});
@@ -548,87 +423,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    private String getCurrentDateTime() {
-        java.text.SimpleDateFormat sdf =
-                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
-        return sdf.format(new java.util.Date());
-    }
-
-
-
-    //làm tính năng trả dữ liệu Tên ra profile
-    public String getUserNameById(long userId) {
-
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.query(
-                TABLE_USERS,
-                new String[]{COL_FULLNAME},
-                COL_ID + "=?",
-                new String[]{String.valueOf(userId)},
-                null,
-                null,
-                null
-        );
-
-        String name = "";
-
-        if (cursor.moveToFirst()) {
-            name = cursor.getString(
-                    cursor.getColumnIndexOrThrow(COL_FULLNAME)
-            );
-        }
-
-        cursor.close();
-
-        return name;
-
-
-    }
-
     /**
-     * Lấy thông tin đầy đủ user theo id (fullname, email, phone)
-     * Trả về mảng [fullname, email, phone] hoặc null nếu không tìm thấy
+     * Đặt hàng: tạo order + lưu order_items + xóa giỏ hàng (1 transaction)
      */
-    public String[] getUserById(long userId) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.query(
-                TABLE_USERS,
-                new String[]{COL_FULLNAME, COL_EMAIL, COL_PHONE},
-                COL_ID + "=?",
-                new String[]{String.valueOf(userId)},
-                null, null, null
-        );
-        String[] result = null;
-        if (cursor.moveToFirst()) {
-            result = new String[]{
-                    cursor.getString(cursor.getColumnIndexOrThrow(COL_FULLNAME)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COL_EMAIL)),
-                    cursor.getString(cursor.getColumnIndexOrThrow(COL_PHONE))
-            };
-        }
-        cursor.close();
-        return result;
-    }
+    public long placeOrder(int userId, List<Cart> cartItems, double subtotal, double total) {
+        // FIX: dùng User object thay vì String[]
+        User user = getUserById(userId);
+        if (user == null) return -1;
 
-    /**
-     * Đặt hàng: tạo order + lưu order_items + xóa giỏ hàng
-     *
-     * @param userId      id người dùng
-     * @param cartItems   danh sách sản phẩm trong giỏ
-     * @param subtotal    tổng tiền hàng
-     * @param total       tổng cuối (subtotal + ship)
-     * @return orderId nếu thành công, -1 nếu thất bại
-     */
-    public long placeOrder(int userId, java.util.List<com.example.btl_ltuddd.model.Cart> cartItems,
-                           double subtotal, double total) {
-        // Lấy thông tin user
-        String[] userInfo = getUserById(userId);
-        if (userInfo == null) return -1;
-
-        String customerName  = userInfo[0];
-        String customerPhone = (userInfo[2] != null) ? userInfo[2] : "";
-        String address       = "";  // Có thể mở rộng sau
+        String customerName  = user.getFullname();
+        String customerPhone = user.getPhone() != null ? user.getPhone() : "";
+        String address       = "";
 
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -645,14 +450,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             long orderId = db.insert(TABLE_ORDERS, null, orderValues);
             if (orderId == -1) return -1;
 
-            // Cập nhật mã đơn #FH-xxxx
+            // Cập nhật mã đơn
             ContentValues codeValues = new ContentValues();
             codeValues.put(COL_O_CODE, "#FH-" + String.format("%04d", orderId));
             db.update(TABLE_ORDERS, codeValues, COL_O_ID + "=?",
                     new String[]{String.valueOf(orderId)});
 
             // 2. Lưu từng sản phẩm vào order_items
-            for (com.example.btl_ltuddd.model.Cart item : cartItems) {
+            for (Cart item : cartItems) {
                 ContentValues itemValues = new ContentValues();
                 itemValues.put(COL_ORDER_ID,   orderId);
                 itemValues.put(COL_PRODUCT_ID, item.getProductId());
@@ -661,8 +466,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 db.insert(TABLE_ORDER_ITEMS, null, itemValues);
             }
 
-            // 3. Xóa giỏ hàng của user
-            db.delete("cart", "user_id=?", new String[]{String.valueOf(userId)});
+            // 3. Xóa giỏ hàng
+            db.delete(TABLE_CART, "user_id=?", new String[]{String.valueOf(userId)});
 
             db.setTransactionSuccessful();
             return orderId;
@@ -671,420 +476,109 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    // Hàm thêm vào giỏ hàng
+    private String getCurrentDateTime() {
+        java.text.SimpleDateFormat sdf =
+                new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
+        return sdf.format(new java.util.Date());
+    }
 
-    // Hàm thêm vào giỏ hàng
-    public long insertCart(
-            int userId,
-            int productId
-    ) {
+    // ─── CART METHODS ──────────────────────────────────────────
 
-        SQLiteDatabase db =
-                getWritableDatabase();
-
-        // Kiểm tra sản phẩm đã tồn tại trong giỏ chưa
-        Cursor cursor =
-                db.rawQuery(
-
-                        "SELECT quantity " +
-                                "FROM cart " +
-                                "WHERE user_id=? " +
-                                "AND product_id=?",
-
-                        new String[]{
-
-                                String.valueOf(
-                                        userId
-                                ),
-
-                                String.valueOf(
-                                        productId
-                                )
-                        }
-
-                );
-
+    public long insertCart(int userId, int productId) {
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT quantity FROM cart WHERE user_id=? AND product_id=?",
+                new String[]{String.valueOf(userId), String.valueOf(productId)});
         if (cursor.moveToFirst()) {
-
-            int quantity =
-                    cursor.getInt(0);
-
-            ContentValues values =
-                    new ContentValues();
-
-            values.put(
-                    "quantity",
-                    quantity + 1
-            );
-
-            db.update(
-
-                    TABLE_CART,
-
-                    values,
-
+            int quantity = cursor.getInt(0);
+            ContentValues values = new ContentValues();
+            values.put("quantity", quantity + 1);
+            db.update(TABLE_CART, values,
                     "user_id=? AND product_id=?",
-
-                    new String[]{
-
-                            String.valueOf(
-                                    userId
-                            ),
-
-                            String.valueOf(
-                                    productId
-                            )
-
-                    }
-
-            );
-
+                    new String[]{String.valueOf(userId), String.valueOf(productId)});
             cursor.close();
-
             return 1;
         }
-
         cursor.close();
-
-        ContentValues values =
-                new ContentValues();
-
-        values.put(
-                "user_id",
-                userId
-        );
-
-        values.put(
-                "product_id",
-                productId
-        );
-
-        values.put(
-                "quantity",
-                1
-        );
-
-        return db.insert(
-
-                TABLE_CART,
-
-                null,
-
-                values
-
-        );
+        ContentValues values = new ContentValues();
+        values.put("user_id",    userId);
+        values.put("product_id", productId);
+        values.put("quantity",   1);
+        return db.insert(TABLE_CART, null, values);
     }
 
-
-
-    // Lấy sản phẩm trong giỏ hàng
     public List<Product> getCartProducts(int userId) {
-
-        List<Product> list =
-                new ArrayList<>();
-
-        SQLiteDatabase db =
-                getReadableDatabase();
-
-        String sql =
-
-                "SELECT " +
-                        "p.*, " +
-                        "c.quantity " +
-
-                        "FROM cart c " +
-
-                        "INNER JOIN products p " +
-
-                        "ON c.product_id = p.id " +
-
-                        "WHERE c.user_id = ?";
-
-        Cursor cursor =
-                db.rawQuery(
-                        sql,
-                        new String[]{
-                                String.valueOf(userId)
-                        }
-                );
-
+        List<Product> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT p.*, c.quantity FROM cart c "
+                        + "INNER JOIN products p ON c.product_id = p.id "
+                        + "WHERE c.user_id = ?",
+                new String[]{String.valueOf(userId)});
         if (cursor.moveToFirst()) {
-
             do {
-
-                Product product =
-                        new Product();
-
-                product.setId(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("id")
-                        )
-                );
-
-                product.setName(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("name")
-                        )
-                );
-
-                product.setPrice(
-                        cursor.getDouble(
-                                cursor.getColumnIndexOrThrow("price")
-                        )
-                );
-
-                product.setImageUrl(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("image_url")
-                        )
-                );
-
-                product.setUnit(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("unit")
-                        )
-                );
-
-                product.setQuantity(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("quantity")
-                        )
-                );
-
+                Product product = new Product();
+                product.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                product.setName(cursor.getString(cursor.getColumnIndexOrThrow("name")));
+                product.setPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
+                product.setImageUrl(cursor.getString(cursor.getColumnIndexOrThrow("image_url")));
+                product.setUnit(cursor.getString(cursor.getColumnIndexOrThrow("unit")));
+                product.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow("quantity")));
                 list.add(product);
-
-            }
-
-            while (
-                    cursor.moveToNext()
-            );
+            } while (cursor.moveToNext());
         }
-
         cursor.close();
-
         return list;
     }
 
-
-    // Xóa sản phẩm khỏi giỏ
-    public boolean removeCart(
-            int userId,
-            int productId
-    ) {
-
-        SQLiteDatabase db =
-                getWritableDatabase();
-
-        int rows =
-
-                db.delete(
-
-                        TABLE_CART,
-
-                        "user_id=? AND product_id=?",
-
-                        new String[]{
-
-                                String.valueOf(
-                                        userId
-                                ),
-
-                                String.valueOf(
-                                        productId
-                                )
-
-                        }
-
-                );
-
-        return rows > 0;
-
+    public boolean removeCart(int userId, int productId) {
+        return getWritableDatabase().delete(TABLE_CART,
+                "user_id=? AND product_id=?",
+                new String[]{String.valueOf(userId), String.valueOf(productId)}) > 0;
     }
 
-
-
-    // Xóa toàn bộ giỏ hàng
-    public void clearCart(
-            int userId
-    ) {
-
-        SQLiteDatabase db =
-                getWritableDatabase();
-
-        db.delete(
-
-                TABLE_CART,
-
-                "user_id=?",
-
-                new String[]{
-
-                        String.valueOf(
-                                userId
-                        )
-
-                }
-
-        );
-
+    public void clearCart(int userId) {
+        getWritableDatabase().delete(TABLE_CART,
+                "user_id=?", new String[]{String.valueOf(userId)});
     }
 
-    //Hàm update số lượng
-    public void updateCartQuantity(
-            int cartId,
-            int quantity
-    ){
-
-        SQLiteDatabase db =
-                getWritableDatabase();
-
-        ContentValues cv =
-                new ContentValues();
-
-        cv.put(
-                "quantity",
-                quantity
-        );
-
-        db.update(
-                "cart",
-                cv,
-                "id=?",
-                new String[]{
-                        String.valueOf(cartId)
-                }
-        );
-
+    public void updateCartQuantity(int cartId, int quantity) {
+        ContentValues cv = new ContentValues();
+        cv.put("quantity", quantity);
+        getWritableDatabase().update("cart", cv, "id=?",
+                new String[]{String.valueOf(cartId)});
     }
 
-
-    public void deleteCart(
-            int cartId
-    ){
-
-        getWritableDatabase().delete(
-                "cart",
-                "id=?",
-                new String[]{
-                        String.valueOf(cartId)
-                }
-        );
-
+    public void deleteCart(int cartId) {
+        getWritableDatabase().delete("cart", "id=?",
+                new String[]{String.valueOf(cartId)});
     }
 
-    //Data base trả về list <Cart>
-    public List<Cart> getCartItems(
-            int userId
-    ) {
-
-        List<Cart> list =
-                new ArrayList<>();
-
-        SQLiteDatabase db =
-                getReadableDatabase();
-
-        Cursor cursor =
-                db.rawQuery(
-
-                        "SELECT " +
-                                "c.id," +
-                                "c.user_id," +
-                                "c.product_id," +
-                                "c.quantity," +
-                                "p.name," +
-                                "p.price," +
-                                "p.image_url," +
-                                "p.unit " +
-                                "FROM cart c " +
-                                "INNER JOIN products p " +
-                                "ON c.product_id = p.id " +
-                                "WHERE c.user_id=?",
-
-                        new String[]{
-
-                                String.valueOf(
-                                        userId
-                                )
-
-                        }
-
-                );
-
-        if (
-                cursor.moveToFirst()
-        ) {
-
+    public List<Cart> getCartItems(int userId) {
+        List<Cart> list = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery(
+                "SELECT c.id, c.user_id, c.product_id, c.quantity, "
+                        + "p.name, p.price, p.image_url, p.unit "
+                        + "FROM cart c "
+                        + "INNER JOIN products p ON c.product_id = p.id "
+                        + "WHERE c.user_id=?",
+                new String[]{String.valueOf(userId)});
+        if (cursor.moveToFirst()) {
             do {
-
-                Cart cart =
-                        new Cart();
-
-                cart.setId(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("id")
-                        )
-                );
-
-                cart.setUserId(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("user_id")
-                        )
-                );
-
-                cart.setProductId(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("product_id")
-                        )
-                );
-
-                cart.setQuantity(
-                        cursor.getInt(
-                                cursor.getColumnIndexOrThrow("quantity")
-                        )
-                );
-
-                cart.setProductName(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("name")
-                        )
-                );
-
-                cart.setProductPrice(
-                        cursor.getDouble(
-                                cursor.getColumnIndexOrThrow("price")
-                        )
-                );
-
-                cart.setProductImage(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("image_url")
-                        )
-                );
-
-                cart.setProductUnit(
-                        cursor.getString(
-                                cursor.getColumnIndexOrThrow("unit")
-                        )
-                );
-
-                list.add(
-                        cart
-                );
-
-            }
-
-            while (
-                    cursor.moveToNext()
-            );
-
+                Cart cart = new Cart();
+                cart.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                cart.setUserId(cursor.getInt(cursor.getColumnIndexOrThrow("user_id")));
+                cart.setProductId(cursor.getInt(cursor.getColumnIndexOrThrow("product_id")));
+                cart.setQuantity(cursor.getInt(cursor.getColumnIndexOrThrow("quantity")));
+                cart.setProductName(cursor.getString(cursor.getColumnIndexOrThrow("name")));
+                cart.setProductPrice(cursor.getDouble(cursor.getColumnIndexOrThrow("price")));
+                cart.setProductImage(cursor.getString(cursor.getColumnIndexOrThrow("image_url")));
+                cart.setProductUnit(cursor.getString(cursor.getColumnIndexOrThrow("unit")));
+                list.add(cart);
+            } while (cursor.moveToNext());
         }
-
         cursor.close();
-
         return list;
     }
-
-    // Làm với khi khách hàng đặt hàng
-
 }
-
