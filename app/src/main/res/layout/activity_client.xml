@@ -45,18 +45,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"/>
 
-                    <TextView
-                        android:text="📍 Giao đến: 123 Lê Lợi"
-                        android:textSize="14sp"
-                        android:textColor="#333"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
                 </LinearLayout>
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_search"/>
+
             </LinearLayout>
 
             <LinearLayout
@@ -73,6 +64,7 @@
                     android:src="@drawable/ic_search"/>
 
                 <EditText
+                    android:id="@+id/edtSearch"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

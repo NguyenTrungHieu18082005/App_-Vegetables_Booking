@@ -74,8 +74,10 @@
                 </FrameLayout>
             </LinearLayout>
 
-            <!-- FORM -->
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Họ và tên" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <!-- Họ và tên -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Họ và tên" android:textSize="13sp" android:textColor="#888"
+                android:layout_marginBottom="6dp"/>
             <EditText
                 android:id="@+id/edtFullName"
                 android:layout_width="match_parent"
@@ -86,7 +88,10 @@
                 android:layout_marginBottom="16dp"
                 android:inputType="textPersonName"/>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Số điện thoại" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <!-- Số điện thoại -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Số điện thoại" android:textSize="13sp" android:textColor="#888"
+                android:layout_marginBottom="6dp"/>
             <EditText
                 android:id="@+id/edtPhone"
                 android:layout_width="match_parent"
@@ -97,7 +102,10 @@
                 android:layout_marginBottom="16dp"
                 android:inputType="phone"/>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Email" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <!-- Email -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Email" android:textSize="13sp" android:textColor="#888"
+                android:layout_marginBottom="6dp"/>
             <EditText
                 android:id="@+id/edtEmail"
                 android:layout_width="match_parent"
@@ -108,16 +116,79 @@
                 android:layout_marginBottom="16dp"
                 android:inputType="textEmailAddress"/>
 
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Ngày sinh" android:textSize="13sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
-            <EditText
-                android:id="@+id/edtDob"
+            <!-- Đường kẻ phân cách -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E0E0E0"
+                android:layout_marginVertical="8dp"/>
+
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Đổi mật khẩu (để trống nếu không đổi)"
+                android:textSize="13sp" android:textColor="#888"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Mật khẩu mới -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Mật khẩu mới" android:textSize="13sp" android:textColor="#888"
+                android:layout_marginBottom="6dp"/>
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
-                android:hint="DD/MM/YYYY"
-                android:paddingHorizontal="16dp"
                 android:background="@drawable/bg_search"
-                android:layout_marginBottom="24dp"
-                android:inputType="date"/>
+                android:layout_marginBottom="16dp">
+                <EditText
+                    android:id="@+id/edtNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Nhập mật khẩu mới"
+                    android:paddingHorizontal="16dp"
+                    android:paddingEnd="48dp"
+                    android:background="@null"
+                    android:inputType="textPassword"/>
+                <ImageView
+                    android:id="@+id/btnToggleNewPwd"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_visibility"
+                    android:padding="6dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </RelativeLayout>
+
+            <!-- Xác nhận mật khẩu -->
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="Xác nhận mật khẩu" android:textSize="13sp" android:textColor="#888"
+                android:layout_marginBottom="6dp"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_search"
+                android:layout_marginBottom="24dp">
+                <EditText
+                    android:id="@+id/edtConfirmPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Nhập lại mật khẩu mới"
+                    android:paddingHorizontal="16dp"
+                    android:paddingEnd="48dp"
+                    android:background="@null"
+                    android:inputType="textPassword"/>
+                <ImageView
+                    android:id="@+id/btnToggleConfirmPwd"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="8dp"
+                    android:src="@drawable/ic_visibility"
+                    android:padding="6dp"
+                    android:clickable="true"
+                    android:focusable="true"/>
+            </RelativeLayout>
 
             <Button
                 android:id="@+id/btnSaveInfo"

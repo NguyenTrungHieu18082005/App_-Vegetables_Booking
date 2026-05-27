@@ -34,10 +34,7 @@
             android:textColor="#114D18"
             android:paddingStart="12dp"/>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_search"/>
+
     </LinearLayout>
 
     <!-- SCROLLABLE CONTENT -->

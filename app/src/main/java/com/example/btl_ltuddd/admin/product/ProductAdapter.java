@@ -24,6 +24,8 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
         void onDelete(Product product);
     }
 
+
+
     private final Context context;
     private List<Product> products;
     private final OnProductActionListener listener;
@@ -101,4 +103,7 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ViewHold
             btnDelete      = itemView.findViewById(R.id.btn_delete);
         }
     }
+
+
+
 }

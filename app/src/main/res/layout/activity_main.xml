@@ -12,13 +12,13 @@
         android:id="@+id/btnClient1"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:text="Mở Client Activity"/>
+        android:text="Mở Trang Client" />
 
     <Button
         android:id="@+id/btnClient2"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="Mở Client Activity 2"/>
+        android:text="Mở Trang Admin" />
 
 </LinearLayout>

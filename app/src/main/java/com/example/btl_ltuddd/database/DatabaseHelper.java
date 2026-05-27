@@ -207,6 +207,37 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return user;
     }
 
+    /**
+     * Cập nhật thông tin user (fullname, phone, email).
+     * Nếu newPassword != null thì đổi luôn mật khẩu.
+     * Trả về số hàng bị ảnh hưởng (1 = thành công, 0 = thất bại).
+     */
+    public int updateUserInfo(long userId, String fullname, String phone,
+                              String email, String newPassword) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_FULLNAME, fullname);
+        cv.put(COL_PHONE,    phone);
+        cv.put(COL_EMAIL,    email);
+        if (newPassword != null && !newPassword.isEmpty()) {
+            cv.put(COL_PASSWORD, newPassword);
+        }
+        return db.update(TABLE_USERS, cv, COL_ID + "=?",
+                new String[]{String.valueOf(userId)});
+    }
+
+    /** Kiểm tra mật khẩu hiện tại của user có khớp không */
+    public boolean checkPassword(long userId, String password) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(TABLE_USERS, new String[]{COL_ID},
+                COL_ID + "=? AND " + COL_PASSWORD + "=?",
+                new String[]{String.valueOf(userId), password},
+                null, null, null);
+        boolean match = c.getCount() > 0;
+        c.close();
+        return match;
+    }
+
     /** Trả về tên user theo id (dùng cho profile) */
     public String getUserNameById(long userId) {
         User user = getUserById(userId);
@@ -322,6 +353,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return products;
     }
 
+    //Tìm kiếm sản phẩm
     public List<Product> searchProducts(String query) {
         List<Product> list = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();

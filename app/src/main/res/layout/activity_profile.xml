@@ -31,10 +31,7 @@
             android:textColor="#114D18"
             android:gravity="center"/>
 
-        <ImageView
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_search"/>
+
     </LinearLayout>
 
     <!-- BOTTOM NAV -->
