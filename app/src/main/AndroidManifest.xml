@@ -13,6 +13,16 @@
         android:theme="@style/Theme.BTL_LTUDDD">
 
         <activity
+            android:name=".admin.profile.AdminProfileActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".admin.auth.AdminLoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".admin.auth.AdminRegisterActivity"
+            android:exported="false" />
+        <activity
             android:name=".admin.order.AdminOrderActivity"
             android:exported="false" />
         <activity

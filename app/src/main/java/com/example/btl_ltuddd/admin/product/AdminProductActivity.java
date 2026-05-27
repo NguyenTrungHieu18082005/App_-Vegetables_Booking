@@ -17,13 +17,12 @@ import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.admin.AdminActivity;
 import com.example.btl_ltuddd.admin.order.AdminOrderActivity;
 import com.example.btl_ltuddd.admin.product.addeditproduct.AddEditProductActivity;
+import com.example.btl_ltuddd.admin.profile.AdminProfileActivity;
 import com.example.btl_ltuddd.database.DatabaseHelper;
 import com.example.btl_ltuddd.model.Product;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
-
-import java.util.List;
 
 public class AdminProductActivity extends AppCompatActivity implements ProductAdapter.OnProductActionListener {
 
@@ -103,7 +102,7 @@ public class AdminProductActivity extends AppCompatActivity implements ProductAd
             }
 
             if (id == R.id.nav_profile) {
-                startActivity(new Intent(this, AdminOrderActivity.class));
+                startActivity(new Intent(this, AdminProfileActivity.class));
                 finish();
                 return true;
             }

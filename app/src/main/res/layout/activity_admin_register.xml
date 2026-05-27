@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F0F2EC"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- TOP BAR -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="20dp"
+            android:background="#F0F2EC">
+
+            <TextView
+                android:text="🛡"
+                android:textSize="20sp"
+                android:textColor="#1B4D2E"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text=" Fresh Harvest Admin"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#1B4D2E"/>
+            <!-- Avatar placeholder -->
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="#D4EDDA">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="👤"
+                    android:textSize="20sp"/>
+            </FrameLayout>
+        </LinearLayout>
+
+        <View android:layout_width="match_parent" android:layout_height="1dp" android:background="#E0E3DA"/>
+
+        <!-- CARD FORM -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="#FFFFFF">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="24dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tạo Tài Khoản"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="#1A1A1A"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hoàn thành các chi tiết dưới đây để đăng ký một nhân viên mới."
+                    android:textSize="13sp"
+                    android:textColor="#777"
+                    android:layout_marginBottom="24dp"/>
+
+                <!-- FULL NAME -->
+                <TextView style="@style/LabelStyle" android:text="Họ và Tên"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_search"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="👤 " android:textSize="15sp"/>
+                    <EditText
+                        android:id="@+id/edtAdminFullName"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="Nguyen Trung Hieu"
+                        android:inputType="textPersonName"/>
+                </LinearLayout>
+
+                <!-- STAFF ID -->
+                <TextView style="@style/LabelStyle" android:text="ID"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_search"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="🪪 " android:textSize="15sp"/>
+                    <EditText
+                        android:id="@+id/edtAdminStaffId"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint="ID của bạn"
+                        android:inputType="text"/>
+                </LinearLayout>
+
+                <!-- DEPARTMENT -->
+                <TextView style="@style/LabelStyle" android:text="Phòng Ban"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <Spinner
+                    android:id="@+id/spinnerDept"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_search"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <!-- WORK EMAIL -->
+                <TextView style="@style/LabelStyle" android:text="Email"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_search"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="14dp"
+                    android:layout_marginBottom="16dp">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="✉ " android:textSize="15sp"/>
+                    <EditText
+                        android:id="@+id/edtAdminEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:hint=".appleseed@organicharvest.com"
+                        android:inputType="textEmailAddress"/>
+                </LinearLayout>
+
+                <!-- ACCESS LEVEL -->
+                <TextView style="@style/LabelStyle" android:text="Cấp Bậc"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <LinearLayout
+                        android:id="@+id/btnAccessManager"
+                        android:layout_width="0dp"
+                        android:layout_height="70dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:layout_marginEnd="8dp"
+                        android:background="#9DDB6E"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="⚙" android:textSize="20sp" android:textColor="#1A1A1A"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Manager" android:textSize="13sp"
+                            android:textStyle="bold" android:textColor="#1A1A1A"
+                            android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/btnAccessStaff"
+                        android:layout_width="0dp"
+                        android:layout_height="70dp"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        android:background="@drawable/bg_search"
+                        android:clickable="true"
+                        android:focusable="true">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="🗂" android:textSize="20sp" android:textColor="#555"/>
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Staff Member" android:textSize="13sp"
+                            android:textColor="#555" android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- TEMP PASSWORD -->
+                <TextView style="@style/LabelStyle" android:text="Mật Khẩu"
+                    android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_search"
+                    android:layout_marginBottom="24dp">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginStart="14dp"
+                        android:text="🔒 " android:textSize="15sp"/>
+                    <EditText
+                        android:id="@+id/edtAdminTempPassword"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@null"
+                        android:paddingStart="44dp"
+                        android:paddingEnd="48dp"
+                        android:hint="••••••••"
+                        android:inputType="textPassword"/>
+                    <ImageView
+                        android:id="@+id/btnToggleRegPwd"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_centerVertical="true"
+                        android:layout_marginEnd="8dp"
+                        android:src="@drawable/ic_visibility"
+                        android:padding="6dp"
+                        android:clickable="true"
+                        android:focusable="true"/>
+                </RelativeLayout>
+
+                <!-- SUBMIT -->
+                <Button
+                    android:id="@+id/btnCompleteRegistration"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:text="✓  Đăng Ký"
+                    android:textAllCaps="false"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:textColor="#FFFFFF"
+                    android:backgroundTint="#1B4D2E"
+                    android:layout_marginBottom="16dp"/>
+
+                <View android:layout_width="match_parent" android:layout_height="1dp"
+                    android:background="#EEE" android:layout_marginBottom="16dp"/>
+
+                <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="center">
+                    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Already have an account? " android:textSize="13sp" android:textColor="#888"/>
+                    <TextView
+                        android:id="@+id/tvGoToAdminLogin"
+                        android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:text="Đăng Nhập" android:textSize="13sp"
+                        android:textStyle="bold" android:textColor="#1B4D2E"
+                        android:clickable="true" android:focusable="true"/>
+                </LinearLayout>
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <!-- FOOTER BADGES -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingBottom="24dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="🛡  End-to-End Encryption Enabled"
+                android:textSize="12sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="✏  Compliance with Data Privacy Act"
+                android:textSize="12sp" android:textColor="#888" android:layout_marginBottom="6dp"/>
+            <TextView
+                android:id="@+id/tvLastAudit"
+                android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:text="🕐  Last login audit: just now"
+                android:textSize="12sp" android:textColor="#888"/>
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

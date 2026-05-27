@@ -7,7 +7,7 @@ import android.widget.Button;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.btl_ltuddd.admin.AdminActivity;
+import com.example.btl_ltuddd.admin.auth.AdminLoginActivity;
 import com.example.btl_ltuddd.auth.RegisterActivity;
 import com.example.btl_ltuddd.client.dashboard.ClientActivity;
 import com.example.btl_ltuddd.database.DatabaseHelper;
@@ -45,14 +45,11 @@ public class MainActivity extends AppCompatActivity {
 
         // Sự kiện click button 2
         btnClient2.setOnClickListener(v -> {
-
             Intent intent = new Intent(
                     MainActivity.this,
-                    AdminActivity.class
+                    AdminLoginActivity.class
             );
-
             startActivity(intent);
-
         });
 
 

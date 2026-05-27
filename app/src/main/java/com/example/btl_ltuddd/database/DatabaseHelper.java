@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.example.btl_ltuddd.client.dashboard.ProductAdapter;
+import com.example.btl_ltuddd.model.AdminAccount;
 import com.example.btl_ltuddd.model.Cart;
 import com.example.btl_ltuddd.model.Order;
 import com.example.btl_ltuddd.model.Product;
@@ -23,7 +24,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     DatabaseHelper dbHelper;
 
     public static final String DB_NAME    = "hoaquasach.db";
-    private static final int    DB_VERSION = 3;
+    private static final int    DB_VERSION = 4;
+
+    // Bảng admin_accounts
+    public static final String TABLE_ADMIN    = "admin_accounts";
+    public static final String COL_A_ID       = "id";
+    public static final String COL_A_FULLNAME = "full_name";
+    public static final String COL_A_STAFFID  = "staff_id";
+    public static final String COL_A_DEPT     = "department";
+    public static final String COL_A_EMAIL    = "email";
+    public static final String COL_A_PASSWORD = "password";
+    public static final String COL_A_LEVEL    = "access_level";
 
     // Bảng users
     public static final String TABLE_USERS = "users";
@@ -129,10 +140,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 + COL_QTY        + " INTEGER,"
                 + COL_PRICE      + " REAL"
                 + ")");
+        db.execSQL("CREATE TABLE " + TABLE_ADMIN + " ("
+                + COL_A_ID       + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + COL_A_FULLNAME + " TEXT NOT NULL, "
+                + COL_A_STAFFID  + " TEXT UNIQUE NOT NULL, "
+                + COL_A_DEPT     + " TEXT, "
+                + COL_A_EMAIL    + " TEXT UNIQUE, "
+                + COL_A_PASSWORD + " TEXT NOT NULL, "
+                + COL_A_LEVEL    + " TEXT DEFAULT 'staff'"
+                + ")");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS admin_accounts");
         db.execSQL("DROP TABLE IF EXISTS cart");
         db.execSQL("DROP TABLE IF EXISTS order_items");
         db.execSQL("DROP TABLE IF EXISTS orders");
@@ -242,6 +263,61 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public String getUserNameById(long userId) {
         User user = getUserById(userId);
         return user != null ? user.getFullname() : "";
+    }
+
+    // ─── ADMIN ACCOUNT METHODS ─────────────────────────────────
+
+    /** Đăng ký admin. Trả về id nếu thành công, -1 nếu staffId/email trùng */
+    public long registerAdmin(String fullName, String staffId, String department,
+                              String email, String password, String accessLevel) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_A_FULLNAME, fullName);
+        cv.put(COL_A_STAFFID,  staffId);
+        cv.put(COL_A_DEPT,     department);
+        cv.put(COL_A_EMAIL,    email);
+        cv.put(COL_A_PASSWORD, password);
+        cv.put(COL_A_LEVEL,    accessLevel);
+        try { return db.insertOrThrow(TABLE_ADMIN, null, cv); }
+        catch (Exception e) { return -1; }
+    }
+
+    /**
+     * Đăng nhập admin bằng email hoặc staffId + password.
+     * Trả về id nếu thành công, -1 nếu sai.
+     */
+    public long loginAdmin(String emailOrStaffId, String password) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(TABLE_ADMIN, new String[]{COL_A_ID},
+                "(" + COL_A_EMAIL + "=? OR " + COL_A_STAFFID + "=?) AND " + COL_A_PASSWORD + "=?",
+                new String[]{emailOrStaffId, emailOrStaffId, password},
+                null, null, null);
+        long id = -1;
+        if (c.moveToFirst()) id = c.getLong(0);
+        c.close();
+        return id;
+    }
+
+    /** Lấy AdminAccount theo id */
+    public AdminAccount getAdminById(long adminId) {
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor c = db.query(TABLE_ADMIN, null,
+                COL_A_ID + "=?", new String[]{String.valueOf(adminId)},
+                null, null, null);
+        AdminAccount admin = null;
+        if (c.moveToFirst()) {
+            admin = new AdminAccount(
+                    c.getInt(c.getColumnIndexOrThrow(COL_A_ID)),
+                    c.getString(c.getColumnIndexOrThrow(COL_A_FULLNAME)),
+                    c.getString(c.getColumnIndexOrThrow(COL_A_STAFFID)),
+                    c.getString(c.getColumnIndexOrThrow(COL_A_DEPT)),
+                    c.getString(c.getColumnIndexOrThrow(COL_A_EMAIL)),
+                    null, // không trả password ra ngoài
+                    c.getString(c.getColumnIndexOrThrow(COL_A_LEVEL))
+            );
+        }
+        c.close();
+        return admin;
     }
 
     public int getUserCount() {
