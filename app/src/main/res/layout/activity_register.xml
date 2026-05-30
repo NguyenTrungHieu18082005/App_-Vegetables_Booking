@@ -3,397 +3,94 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F0EFE7"
-    android:fillViewport="true">
+    android:fillViewport="true"
+    android:background="#FFFFFF">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="24dp">
 
-        <!-- ===== HEADER / TOOLBAR ===== -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="16dp"
-            android:background="#F0EFE7">
-
-            <!-- Menu icon -->
-            <ImageButton
-                android:id="@+id/btnMenu"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_menu"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="#1B5E20" />
-
-            <!-- App name -->
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Fresh Harvest"
-                android:textSize="22sp"
-                android:textStyle="bold"
-                android:textColor="#1B5E20"
-                android:gravity="center"
-                android:fontFamily="serif" />
-
-            <!-- Search icon -->
-            <ImageButton
-                android:id="@+id/btnSearch"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:src="@drawable/ic_search"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                app:tint="#1B5E20" />
-        </LinearLayout>
-
-        <!-- ===== HERO IMAGE ===== -->
-        <ImageView
-            android:id="@+id/imgHero"
-            android:layout_width="match_parent"
-            android:layout_height="180dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_launcher_foreground"
-            android:background="#4CAF50"
-            android:layout_marginHorizontal="16dp"
-            android:layout_marginTop="8dp" />
-
-        <!-- ===== TITLE ===== -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tạo Tài Khoản"
-            android:textSize="28sp"
+            android:text="Đăng ký tài khoản"
+            android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#1B5E20"
-            android:fontFamily="serif"
-            android:layout_gravity="center"
-            android:layout_marginTop="24dp" />
+            android:textColor="#2E7D32"
+            android:layout_marginBottom="32dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Tham gia cộng đồng những người yêu thích sản phẩm tươi sống của chúng tôi."
-            android:textSize="14sp"
-            android:textColor="#555555"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_marginTop="6dp"
-            android:layout_marginHorizontal="24dp" />
-
-        <!-- ===== FORM CARD ===== -->
-        <androidx.cardview.widget.CardView
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:layout_marginTop="20dp"
-            app:cardCornerRadius="20dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="#FFFFFF">
-
-            <LinearLayout
+            android:hint="Họ tên"
+            android:layout_marginBottom="16dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtFullName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:inputType="textPersonName" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- FULL NAME -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Họ tên:"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="6dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Số điện thoại"
+            android:layout_marginBottom="16dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="phone" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_input_field"
-                    android:paddingHorizontal="14dp"
-                    android:layout_marginBottom="18dp">
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:layout_marginBottom="16dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textEmailAddress" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_menu_myplaces"
-                        app:tint="#888888"
-                        android:layout_marginEnd="10dp" />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Mật khẩu"
+            app:passwordToggleEnabled="true"
+            android:layout_marginBottom="24dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edtPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-                    <EditText
-                        android:id="@+id/edtFullName"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="Nguyen Trung Hieu"
-                        android:textColorHint="#AAAAAA"
-                        android:textColor="#212121"
-                        android:textSize="15sp"
-                        android:inputType="textPersonName"
-                        android:background="@null"
-                        android:paddingStart="0dp" />
-                </LinearLayout>
+        <Button
+            android:id="@+id/btnSignUp"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:text="Đăng ký"
+            android:backgroundTint="#2E7D32"
+            app:cornerRadius="8dp" />
 
-                <!-- PHONE NUMBER -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="SĐT:"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="6dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_input_field"
-                    android:paddingHorizontal="14dp"
-                    android:layout_marginBottom="18dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/sym_action_call"
-                        app:tint="#888888"
-                        android:layout_marginEnd="10dp" />
-
-                    <EditText
-                        android:id="@+id/edtPhone"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="+84 "
-                        android:textColorHint="#AAAAAA"
-                        android:textColor="#212121"
-                        android:textSize="15sp"
-                        android:inputType="phone"
-                        android:background="@null"
-                        android:paddingStart="0dp" />
-                </LinearLayout>
-
-                <!-- EMAIL ADDRESS -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Email"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="6dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_input_field"
-                    android:paddingHorizontal="14dp"
-                    android:layout_marginBottom="18dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/sym_action_email"
-                        app:tint="#888888"
-                        android:layout_marginEnd="10dp" />
-
-                    <EditText
-                        android:id="@+id/edtEmail"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:hint="name@example.com"
-                        android:textColorHint="#AAAAAA"
-                        android:textColor="#212121"
-                        android:textSize="15sp"
-                        android:inputType="textEmailAddress"
-                        android:background="@null"
-                        android:paddingStart="0dp" />
-                </LinearLayout>
-
-                <!-- PASSWORD -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Password"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="#212121"
-                    android:layout_marginBottom="6dp" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:background="@drawable/bg_input_field"
-                    android:paddingHorizontal="14dp"
-                    android:layout_marginBottom="20dp">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="20dp"
-                        android:src="@android:drawable/ic_lock_idle_lock"
-                        app:tint="#888888"
-                        android:layout_marginEnd="10dp" />
-
-                    <EditText
-                        android:id="@+id/edtPassword"
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="1"
-                        android:hint="8 ký tự"
-                        android:textColorHint="#AAAAAA"
-                        android:textColor="#212121"
-                        android:textSize="15sp"
-                        android:inputType="textPassword"
-                        android:background="@null"
-                        android:paddingStart="0dp" />
-
-                    <!-- Toggle show/hide password -->
-                    <ImageButton
-                        android:id="@+id/btnTogglePassword"
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
-                        android:src="@drawable/ic_search"
-                        app:tint="#888888"
-                        android:background="?attr/selectableItemBackgroundBorderless"
-                        android:contentDescription="Toggle password" />
-                </LinearLayout>
-
-                <!-- TERMS CHECKBOX -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="top"
-                    android:layout_marginBottom="24dp">
-
-                    <CheckBox
-                        android:id="@+id/checkboxTerms"
-                        android:layout_width="24dp"
-                        android:layout_height="24dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginEnd="10dp"
-                        android:buttonTint="#1B5E20" />
-
-                    <TextView
-                        android:id="@+id/tvTerms"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Toi đong y voi Điou khoan dich vu và Chinh sach bao mat."
-                        android:textSize="13sp"
-                        android:textColor="#333333"
-                        android:lineSpacingExtra="2dp" />
-                </LinearLayout>
-
-                <!-- SIGN UP BUTTON -->
-                <Button
-                    android:id="@+id/btnSignUp"
-                    android:layout_width="match_parent"
-                    android:layout_height="56dp"
-                    android:text="Đăng Ký  →"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:textColor="#FFFFFF"
-                    android:backgroundTint="#1B5E20"
-                    app:cornerRadius="28dp" />
-
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <!-- ALREADY HAVE ACCOUNT -->
-        <LinearLayout
+        <TextView
+            android:id="@+id/tvLogin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:text="Đã có tài khoản? Đăng nhập ngay"
+            android:textColor="#2E7D32"
             android:layout_gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Bạn đã có Tài Khoản ? "
-                android:textSize="14sp"
-                android:textColor="#555555" />
-
-            <TextView
-                android:id="@+id/tvLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đăng Nhập"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="#1B5E20"
-                android:clickable="true"
-                android:focusable="true" />
-        </LinearLayout>
-
-        <!-- FOOTER BADGES -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="16dp">
-
-            <!-- Certified Organic -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:layout_marginEnd="24dp">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🌿"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TO CHUC CHUNG NHAN"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#1B5E20"
-                    android:letterSpacing="0.08" />
-            </LinearLayout>
-
-            <!-- Direct Delivery -->
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="🚚"
-                    android:textSize="16sp"
-                    android:layout_marginEnd="4dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="GIAO HANG TRUC TIEP"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:textColor="#1B5E20"
-                    android:letterSpacing="0.08" />
-            </LinearLayout>
-        </LinearLayout>
+            android:layout_marginTop="20dp"
+            android:padding="8dp" />
 
     </LinearLayout>
 </ScrollView>

@@ -3,23 +3,17 @@ package com.example.btl_ltuddd.auth;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.InputType;
 import android.widget.*;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.cardview.widget.CardView;
 import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.client.dashboard.ClientActivity;
 import com.example.btl_ltuddd.database.DatabaseHelper;
 
-public class  LoginActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
     private EditText edtEmailOrPhone, edtPassword;
     private Button btnSignIn;
-    private ImageButton btnTogglePassword;
     private TextView tvForgotPassword, tvSignUp;
-    private CardView btnGoogle, btnFacebook;
-    private boolean isPasswordVisible = false;
-
     private DatabaseHelper dbHelper;
 
     @Override
@@ -27,16 +21,16 @@ public class  LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         if (getSupportActionBar() != null) getSupportActionBar().hide();
 
-        // Nếu đã login rồi thì vào thẳng
+        // Kiểm tra đăng nhập cũ
         SharedPreferences prefs = getSharedPreferences("auth", MODE_PRIVATE);
-        long savedId = prefs.getLong("userId", -1);
-        if (savedId != -1)  {
+        if (prefs.getLong("userId", -1) != -1) {
             navigateToClient();
             return;
         }
 
         setContentView(R.layout.activity_login);
         dbHelper = DatabaseHelper.getInstance(this);
+
         initViews();
         setupListeners();
     }
@@ -45,30 +39,17 @@ public class  LoginActivity extends AppCompatActivity {
         edtEmailOrPhone  = findViewById(R.id.edtEmailOrPhone);
         edtPassword      = findViewById(R.id.edtPassword);
         btnSignIn        = findViewById(R.id.btnSignIn);
-        btnTogglePassword= findViewById(R.id.btnTogglePassword);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         tvSignUp         = findViewById(R.id.tvSignUp);
-        btnGoogle        = findViewById(R.id.btnGoogle);
-        btnFacebook      = findViewById(R.id.btnFacebook);
     }
 
     private void setupListeners() {
-        btnTogglePassword.setOnClickListener(v -> {
-            isPasswordVisible = !isPasswordVisible;
-            edtPassword.setInputType(isPasswordVisible
-                    ? InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-                    : InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-            edtPassword.setSelection(edtPassword.getText().length());
-        });
-
         btnSignIn.setOnClickListener(v -> attemptLogin());
+
         tvSignUp.setOnClickListener(v -> startActivity(new Intent(this, RegisterActivity.class)));
+
         tvForgotPassword.setOnClickListener(v ->
                 Toast.makeText(this, "Tính năng đang phát triển", Toast.LENGTH_SHORT).show());
-        btnGoogle.setOnClickListener(v ->
-                Toast.makeText(this, "Đang phát triển", Toast.LENGTH_SHORT).show());
-        btnFacebook.setOnClickListener(v ->
-                Toast.makeText(this, "Đang phát triển", Toast.LENGTH_SHORT).show());
     }
 
     private void attemptLogin() {
@@ -82,7 +63,6 @@ public class  LoginActivity extends AppCompatActivity {
 
         long userId = dbHelper.loginUser(email, password);
         if (userId != -1) {
-            // Lưu session bằng SharedPreferences
             getSharedPreferences("auth", MODE_PRIVATE).edit()
                     .putLong("userId", userId)
                     .apply();

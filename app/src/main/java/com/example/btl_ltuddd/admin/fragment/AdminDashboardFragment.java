@@ -1,11 +1,14 @@
 package com.example.btl_ltuddd.admin.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.TextView;
 import androidx.annotation.*;
 import androidx.fragment.app.Fragment;
 import com.example.btl_ltuddd.R;
+import com.example.btl_ltuddd.admin.order.AdminOrderActivity;
+import com.example.btl_ltuddd.admin.product.addeditproduct.AddEditProductActivity;
 import com.example.btl_ltuddd.admin.view.BarChartView;
 import com.example.btl_ltuddd.database.DatabaseHelper;
 
@@ -24,15 +27,14 @@ public class AdminDashboardFragment extends Fragment {
         ((TextView) view.findViewById(R.id.tv_low_stock))
                 .setText(String.valueOf(db.getLowStockCount(5)));
 
-        BarChartView chart = view.findViewById(R.id.bar_chart);
-        chart.setValues(new float[]{3.2f, 4.1f, 2.8f, 5.2f, 0f, 0f}, 3);
-
+//
         view.findViewById(R.id.btn_add_product).setOnClickListener(v -> {
-            // TODO: mở AddProductActivity
+             startActivity(new Intent(requireContext(), AddEditProductActivity.class));
         });
 
         view.findViewById(R.id.btn_view_orders).setOnClickListener(v -> {
-            // TODO: switch tab Orders
+            startActivity(new Intent(requireContext(), AdminOrderActivity.class));
+
         });
     }
 }

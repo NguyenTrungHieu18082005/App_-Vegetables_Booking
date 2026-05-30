@@ -534,54 +534,54 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     /**
      * Đặt hàng: tạo order + lưu order_items + xóa giỏ hàng (1 transaction)
      */
-    public long placeOrder(int userId, List<Cart> cartItems, double subtotal, double total) {
-        // FIX: dùng User object thay vì String[]
+//
+
+    public long placeOrder(int userId, List<Cart> cartItems, double subtotal, double total, String address) {
+        // Lấy thông tin user để lưu vào bảng Orders
         User user = getUserById(userId);
         if (user == null) return -1;
 
-        String customerName  = user.getFullname();
-        String customerPhone = user.getPhone() != null ? user.getPhone() : "";
-        String address       = "";
-
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = this.getWritableDatabase();
+        long orderId = -1;
         db.beginTransaction();
         try {
-            // 1. Tạo đơn hàng
-            ContentValues orderValues = new ContentValues();
-            orderValues.put(COL_O_CUST_NAME,  customerName);
-            orderValues.put(COL_O_CUST_PHONE, customerPhone);
-            orderValues.put(COL_O_TOTAL,      total);
-            orderValues.put(COL_O_STATUS,     "pending");
-            orderValues.put(COL_O_ADDRESS,    address);
-            orderValues.put(COL_O_CREATED,    getCurrentDateTime());
+            // 1. Chèn vào bảng Orders bằng các hằng số COL_ bạn đã khai báo
+            ContentValues values = new ContentValues();
+            values.put(COL_O_CUST_NAME,  user.getFullname());
+            values.put(COL_O_CUST_PHONE, user.getPhone());
+            values.put(COL_O_TOTAL,      total);
+            values.put(COL_O_ADDRESS,    address); // Cột này đã có trong bảng của bạn
+            values.put(COL_O_STATUS,     "pending");
+            values.put(COL_O_CREATED,    getCurrentDateTime());
 
-            long orderId = db.insert(TABLE_ORDERS, null, orderValues);
-            if (orderId == -1) return -1;
+            orderId = db.insert(TABLE_ORDERS, null, values);
 
-            // Cập nhật mã đơn
-            ContentValues codeValues = new ContentValues();
-            codeValues.put(COL_O_CODE, "#FH-" + String.format("%04d", orderId));
-            db.update(TABLE_ORDERS, codeValues, COL_O_ID + "=?",
-                    new String[]{String.valueOf(orderId)});
+            if (orderId != -1) {
+                // Cập nhật mã đơn hàng
+                ContentValues codeValues = new ContentValues();
+                codeValues.put(COL_O_CODE, "#FH-" + String.format("%04d", orderId));
+                db.update(TABLE_ORDERS, codeValues, COL_O_ID + "=?", new String[]{String.valueOf(orderId)});
 
-            // 2. Lưu từng sản phẩm vào order_items
-            for (Cart item : cartItems) {
-                ContentValues itemValues = new ContentValues();
-                itemValues.put(COL_ORDER_ID,   orderId);
-                itemValues.put(COL_PRODUCT_ID, item.getProductId());
-                itemValues.put(COL_QTY,        item.getQuantity());
-                itemValues.put(COL_PRICE,      item.getProductPrice());
-                db.insert(TABLE_ORDER_ITEMS, null, itemValues);
+                // 2. Chèn vào bảng Order_Items
+                for (Cart item : cartItems) {
+                    ContentValues itemValues = new ContentValues();
+                    itemValues.put(COL_ORDER_ID,   orderId);
+                    itemValues.put(COL_PRODUCT_ID, item.getProductId());
+                    itemValues.put(COL_QTY,        item.getQuantity());
+                    itemValues.put(COL_PRICE,      item.getProductPrice());
+                    db.insert(TABLE_ORDER_ITEMS, null, itemValues);
+                }
+                // 3. Xóa giỏ hàng
+                db.delete(TABLE_CART, "user_id = ?", new String[]{String.valueOf(userId)});
+                db.setTransactionSuccessful();
             }
-
-            // 3. Xóa giỏ hàng
-            db.delete(TABLE_CART, "user_id=?", new String[]{String.valueOf(userId)});
-
-            db.setTransactionSuccessful();
-            return orderId;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
         } finally {
             db.endTransaction();
         }
+        return orderId;
     }
 
     private String getCurrentDateTime() {
@@ -689,4 +689,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         cursor.close();
         return list;
     }
+
+
+    //
+    // Đảm bảo hàm này nằm trong DatabaseHelper
+
 }

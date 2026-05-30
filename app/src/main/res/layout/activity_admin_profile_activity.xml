@@ -33,21 +33,7 @@
                     android:gravity="center"
                     android:padding="28dp">
 
-                    <FrameLayout
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:background="#2E6B42">
 
-                        <TextView
-                            android:id="@+id/tvAdminAvatarInitial"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_gravity="center"
-                            android:text="A"
-                            android:textSize="32sp"
-                            android:textStyle="bold"
-                            android:textColor="#FFF"/>
-                    </FrameLayout>
 
                     <TextView
                         android:id="@+id/tvAdminProfileName"

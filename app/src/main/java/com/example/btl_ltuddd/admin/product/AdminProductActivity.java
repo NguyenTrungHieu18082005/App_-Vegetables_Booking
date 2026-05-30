@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -28,9 +27,7 @@ public class AdminProductActivity extends AppCompatActivity implements ProductAd
 
     private DatabaseHelper dbHelper;
     private ProductAdapter adapter;
-    private TextView tvTotalProducts, tvLowStock;
 
-    // Launcher để nhận kết quả trả về từ AddEditProductActivity
     private final ActivityResultLauncher<Intent> addEditLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -43,23 +40,18 @@ public class AdminProductActivity extends AppCompatActivity implements ProductAd
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Thêm dòng này để kiểm tra xem Activity có thực sự được tạo không
         setContentView(R.layout.activity_admin_product);
 
         dbHelper = DatabaseHelper.getInstance(this);
 
-        tvTotalProducts = findViewById(R.id.tv_total_products);
-        tvLowStock = findViewById(R.id.tv_low_stock);
+        // Khởi tạo các View từ XML
         EditText etSearch = findViewById(R.id.et_search);
         FloatingActionButton fab = findViewById(R.id.fab_add_product);
-
         RecyclerView rv = findViewById(R.id.rv_products);
-        rv.setLayoutManager(new LinearLayoutManager(this));
 
+        rv.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ProductAdapter(this, dbHelper.getAllProducts(), this);
         rv.setAdapter(adapter);
-
-        updateStats();
 
         // Xử lý tìm kiếm
         etSearch.addTextChangedListener(new TextWatcher() {
@@ -71,7 +63,6 @@ public class AdminProductActivity extends AppCompatActivity implements ProductAd
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        // Mở màn hình Thêm sản phẩm
         fab.setOnClickListener(v -> {
             Intent intent = new Intent(this, AddEditProductActivity.class);
             addEditLauncher.launch(intent);
@@ -83,8 +74,6 @@ public class AdminProductActivity extends AppCompatActivity implements ProductAd
     private void setupBottomNav() {
         BottomNavigationView bottomNav = findViewById(R.id.admin_bottom_nav);
         bottomNav.setSelectedItemId(R.id.nav_categories);
-
-        // Luôn hiển thị label tất cả các tab
         bottomNav.setLabelVisibilityMode(NavigationBarView.LABEL_VISIBILITY_LABELED);
 
         bottomNav.setOnItemSelectedListener(item -> {
@@ -94,31 +83,22 @@ public class AdminProductActivity extends AppCompatActivity implements ProductAd
                 finish();
                 return true;
             }
-
             if (id == R.id.nav_orders) {
                 startActivity(new Intent(this, AdminOrderActivity.class));
                 finish();
                 return true;
             }
-
             if (id == R.id.nav_profile) {
                 startActivity(new Intent(this, AdminProfileActivity.class));
                 finish();
                 return true;
             }
-
             return id == R.id.nav_categories;
         });
     }
 
-    private void updateStats() {
-        tvTotalProducts.setText(String.valueOf(dbHelper.getProductCount()));
-        tvLowStock.setText(String.valueOf(dbHelper.getLowStockCount(ProductAdapter.LOW_STOCK_THRESHOLD)));
-    }
-
     private void refreshData() {
         adapter.updateList(dbHelper.getAllProducts());
-        updateStats();
     }
 
     @Override

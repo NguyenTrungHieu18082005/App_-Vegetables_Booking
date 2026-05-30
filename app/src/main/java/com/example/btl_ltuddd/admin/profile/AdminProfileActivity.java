@@ -23,33 +23,18 @@ import com.example.btl_ltuddd.admin.product.AdminProductActivity;
 
 public class AdminProfileActivity
         extends AppCompatActivity {
-
     private TextView tvName;
-
-    private TextView tvInitial;
-
     private TextView tvStaffId;
-
     private TextView tvEmail;
 
-    private TextView tvDept;
-
-    private TextView tvLevel;
-
     private Button btnLogout;
-
     @Override
     protected void onCreate(
             Bundle savedInstanceState
     ) {
 
-        super.onCreate(
-                savedInstanceState
-        );
-
-        setContentView(
-                R.layout.activity_admin_profile_activity
-        );
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_admin_profile_activity);
 
         initViews();
 
@@ -71,10 +56,7 @@ public class AdminProfileActivity
                         R.id.tvAdminProfileName
                 );
 
-        tvInitial =
-                findViewById(
-                        R.id.tvAdminAvatarInitial
-                );
+
 
         tvStaffId =
                 findViewById(
@@ -86,15 +68,6 @@ public class AdminProfileActivity
                         R.id.tvAdminEmail
                 );
 
-        tvDept =
-                findViewById(
-                        R.id.tvAdminDepartment
-                );
-
-        tvLevel =
-                findViewById(
-                        R.id.tvAdminAccessLevel
-                );
 
         btnLogout =
                 findViewById(
@@ -158,17 +131,7 @@ public class AdminProfileActivity
                 admin.getFullName()
         );
 
-        tvInitial.setText(
 
-                String.valueOf(
-
-                        admin
-                                .getFullName()
-                                .charAt(0)
-
-                ).toUpperCase()
-
-        );
 
         tvStaffId.setText(
                 admin.getStaffId()
@@ -178,13 +141,6 @@ public class AdminProfileActivity
                 admin.getEmail()
         );
 
-        tvDept.setText(
-                admin.getDepartment()
-        );
-
-        tvLevel.setText(
-                admin.getAccessLevel()
-        );
 
     }
 

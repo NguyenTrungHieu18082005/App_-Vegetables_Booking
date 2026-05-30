@@ -25,11 +25,6 @@
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_menu"/>
-
                 <TextView
                     android:text="Fresh Harvest"
                     android:textSize="26sp"
@@ -66,10 +61,6 @@
                     android:hint="Tìm kiếm rau củ tươi..."
                     android:paddingStart="12dp"/>
 
-                <ImageView
-                    android:layout_width="22dp"
-                    android:layout_height="22dp"
-                    android:src="@drawable/ic_filter"/>
             </LinearLayout>
 
             <HorizontalScrollView
@@ -92,14 +83,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="45dp"/>
 
-                    <Button
-                        android:text="Rau xanh"
-                        android:textAllCaps="false"
-                        android:textColor="#333"
-                        android:backgroundTint="#EAECE6"
-                        android:layout_marginStart="10dp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="45dp"/>
 
                     <Button
                         android:text="Củ quả"
@@ -137,19 +120,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
 
-                <TextView
-                    android:id="@+id/txtSort"
-                    android:text="Sắp xếp: Giá ▾"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:textColor="#333"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:background="?android:attr/selectableItemBackground"
-                    android:clickable="true"
-                    android:focusable="true"/>
+
             </RelativeLayout>
 
             <androidx.recyclerview.widget.RecyclerView
