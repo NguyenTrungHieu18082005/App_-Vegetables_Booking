@@ -27,8 +27,6 @@ public class AdminAccount {
     public void setId(int id)                   { this.id = id; }
     public void setFullName(String v)           { this.fullName = v; }
     public void setStaffId(String v)            { this.staffId = v; }
-//    public void setDepartment(String v)         { this.department = v; }
     public void setEmail(String v)              { this.email = v; }
     public void setPassword(String v)           { this.password = v; }
-//    public void setAccessLevel(String v)        { this.accessLevel = v; }
 }

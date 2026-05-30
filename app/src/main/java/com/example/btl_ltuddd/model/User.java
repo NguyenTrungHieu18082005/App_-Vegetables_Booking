@@ -36,8 +36,6 @@ public class User {
 
     // Setters
     public void setId(int id)             { this.id = id; }
-    public void setFullname(String v)     { this.fullname = v; }
-    public void setPhone(String v)        { this.phone = v; }
     public void setEmail(String v)        { this.email = v; }
     public void setPassword(String v)     { this.password = v; }
 }

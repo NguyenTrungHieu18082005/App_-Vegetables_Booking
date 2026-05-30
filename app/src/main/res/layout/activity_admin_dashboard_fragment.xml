@@ -83,18 +83,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_icon_green_light"
-                        android:layout_marginBottom="12dp">
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_gravity="center"
-                            android:src="@android:drawable/ic_menu_agenda"
-                            app:tint="#2E7D32"/>
-                    </FrameLayout>
+
 
                     <TextView
                         android:text="Đơn hàng mới"
@@ -130,18 +119,7 @@
                     android:orientation="vertical"
                     android:padding="16dp">
 
-                    <FrameLayout
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@drawable/bg_icon_red_light"
-                        android:layout_marginBottom="12dp">
-                        <ImageView
-                            android:layout_width="22dp"
-                            android:layout_height="22dp"
-                            android:layout_gravity="center"
-                            android:src="@android:drawable/ic_dialog_alert"
-                            app:tint="#D32F2F"/>
-                    </FrameLayout>
+
 
                     <TextView
                         android:text="Sắp hết hàng"

@@ -19,9 +19,6 @@ import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
-    ProductAdapter adapter;
-    List<Product> productList;
-    DatabaseHelper dbHelper;
 
     public static final String DB_NAME    = "hoaquasach.db";
     private static final int    DB_VERSION = 4;
@@ -193,16 +190,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return userId;
     }
 
-    /** Kiểm tra email đã tồn tại chưa */
-    public boolean isEmailExists(String email) {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.query(TABLE_USERS, new String[]{COL_ID},
-                COL_EMAIL + "=?", new String[]{email},
-                null, null, null);
-        boolean exists = c.getCount() > 0;
-        c.close();
-        return exists;
-    }
+
 
     /** Lấy User object theo id — trả null nếu không tìm thấy */
     public User getUserById(long userId) {
@@ -443,61 +431,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return list;
     }
 
-    // ─── ORDER METHODS ──────────────────────────────────────────
-
-    public long addOrder(String customerName, String customerPhone,
-                         double totalAmount, String address) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL_O_CUST_NAME,  customerName);
-        values.put(COL_O_CUST_PHONE, customerPhone);
-        values.put(COL_O_TOTAL,      totalAmount);
-        values.put(COL_O_STATUS,     "pending");
-        values.put(COL_O_ADDRESS,    address);
-        values.put(COL_O_CREATED,    getCurrentDateTime());
-        long id = db.insert(TABLE_ORDERS, null, values);
-        ContentValues cv2 = new ContentValues();
-        cv2.put(COL_O_CODE, "#FH-" + String.format("%04d", id));
-        db.update(TABLE_ORDERS, cv2, COL_O_ID + "=?", new String[]{String.valueOf(id)});
-        return id;
-    }
-
-    public int updateOrderStatus(int id, String status) {
-        SQLiteDatabase db = getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL_O_STATUS, status);
-        return db.update(TABLE_ORDERS, values,
-                COL_O_ID + "=?", new String[]{String.valueOf(id)});
-    }
-
-    public boolean deleteOrder(int id) {
-        return getWritableDatabase().delete(TABLE_ORDERS,
-                COL_O_ID + "=?", new String[]{String.valueOf(id)}) > 0;
-    }
-
     public List<Order> getAllOrders() {
         return queryOrders("SELECT * FROM " + TABLE_ORDERS
                 + " ORDER BY " + COL_O_ID + " DESC", null);
     }
 
-    public List<Order> getOrdersByStatus(String status) {
-        return queryOrders("SELECT * FROM " + TABLE_ORDERS
-                + " WHERE " + COL_O_STATUS + "=?"
-                + " ORDER BY " + COL_O_ID + " DESC", new String[]{status});
-    }
 
-    public List<Order> searchOrders(String query) {
-        String like = "%" + query + "%";
-        return queryOrders("SELECT * FROM " + TABLE_ORDERS
-                + " WHERE " + COL_O_CODE + " LIKE ? OR "
-                + COL_O_CUST_NAME + " LIKE ?"
-                + " ORDER BY " + COL_O_ID + " DESC", new String[]{like, like});
-    }
-
-    public int getOrderCount()         { return orderCountByStatus(null); }
-    public int getPendingOrderCount()  { return orderCountByStatus("pending"); }
-    public int getShippingOrderCount() { return orderCountByStatus("shipping"); }
-    public int getDoneOrderCount()     { return orderCountByStatus("done"); }
 
     private int orderCountByStatus(String status) {
         SQLiteDatabase db = getReadableDatabase();

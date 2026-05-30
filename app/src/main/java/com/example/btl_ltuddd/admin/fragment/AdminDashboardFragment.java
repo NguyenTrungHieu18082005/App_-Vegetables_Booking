@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import com.example.btl_ltuddd.R;
 import com.example.btl_ltuddd.admin.order.AdminOrderActivity;
 import com.example.btl_ltuddd.admin.product.addeditproduct.AddEditProductActivity;
-import com.example.btl_ltuddd.admin.view.BarChartView;
 import com.example.btl_ltuddd.database.DatabaseHelper;
 
 public class AdminDashboardFragment extends Fragment {

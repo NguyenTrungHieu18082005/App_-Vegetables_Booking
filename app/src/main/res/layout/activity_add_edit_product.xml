@@ -21,7 +21,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_arrow_back"
+            android:src="@drawable/ic_back"
             app:tint="#1B4D2E"
             android:contentDescription="Quay lại"/>
 
@@ -148,7 +148,6 @@
                 android:id="@+id/spinner_category"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
-                android:background="@drawable/bg_spinner"
                 android:paddingHorizontal="14dp"
                 android:layout_marginBottom="16dp"/>
 
@@ -264,7 +263,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_stat_card_white"
+                android:background="@drawable/bg_search"
                 android:padding="16dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
@@ -326,8 +325,7 @@
             android:id="@+id/btn_save"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:background="@drawable/bg_btn_primary"
-            android:text="💾  Lưu sản phẩm"
+            android:text=" Lưu sản phẩm"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold"/>
